@@ -6,78 +6,154 @@
 <title>Зарплаты — Земский доктор-стоматолог</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0a1628;--card:#11203a;--border:#1e3455;--accent:#5ba3f5;--green:#7ec87e;--yellow:#f0c040;--red:#e05555;--text:#d0d8e8;--text2:#8899aa;--radius:8px}
-body{font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+:root{
+  --bg:#0a1f2e;
+  --card:rgba(45,212,191,0.08);
+  --card-solid:#0e2a3d;
+  --border:rgba(45,212,191,0.15);
+  --accent:#2dd4bf;
+  --accent-dark:#0d9488;
+  --green:#34d399;
+  --yellow:#fbbf24;
+  --red:#f87171;
+  --text:#e2e8f0;
+  --text2:#94a3b8;
+  --input-bg:rgba(255,255,255,0.06);
+  --radius:5px;
+}
+body{font-family:system-ui,-apple-system,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5}
+
+/* Login */
 .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.login-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;width:100%;max-width:360px}
-.login-box h2{text-align:center;margin-bottom:20px;color:var(--accent)}
-.login-box input{width:100%;padding:10px 12px;margin:8px 0;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:14px}
-.login-box button{width:100%;padding:12px;margin-top:12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-size:15px;font-weight:600}
-.login-box button:hover{opacity:.85}
-.header{background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.header h1{font-size:16px;color:var(--accent)}
-.header .user-info{color:var(--text2);font-size:13px}
-.header button{background:none;border:1px solid var(--border);color:var(--text2);padding:6px 12px;border-radius:var(--radius);cursor:pointer;font-size:13px}
+.login-box{background:var(--card-solid);border:1px solid var(--border);border-radius:var(--radius);padding:32px;width:100%;max-width:360px}
+.login-box h2{text-align:center;margin-bottom:20px;color:var(--accent);font-size:18px;font-weight:600}
+.login-box input{width:100%;padding:10px 12px;margin:8px 0;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:14px}
+.login-box input:focus{outline:none;border-color:var(--accent)}
+.login-box button{width:100%;padding:12px;margin-top:12px;background:var(--accent);color:#0a1f2e;border:none;border-radius:var(--radius);cursor:pointer;font-size:15px;font-weight:600;transition:background .2s}
+.login-box button:hover{background:var(--accent-dark)}
+
+/* Header */
+.header{background:var(--card-solid);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.header h1{font-size:15px;color:var(--accent);font-weight:600}
+.header .user-info{color:var(--text2);font-size:13px;display:flex;align-items:center;gap:10px}
+.header button{background:none;border:1px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:var(--radius);cursor:pointer;font-size:13px;transition:all .2s}
 .header button:hover{border-color:var(--accent);color:var(--accent)}
-.tabs{display:flex;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--border);padding:0 12px}
-.tabs button{padding:12px 16px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:13px;white-space:nowrap;border-bottom:2px solid transparent;transition:.2s}
+
+/* Tabs */
+.tabs{display:flex;overflow-x:auto;background:var(--card-solid);border-bottom:1px solid var(--border);padding:0 12px}
+.tabs button{padding:10px 16px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:13px;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s}
 .tabs button:hover{color:var(--text)}
 .tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* Content */
 .content{padding:20px;max-width:1200px;margin:0 auto}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
-.card h3{margin-bottom:12px;color:var(--accent);font-size:15px}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+.card h3{margin-bottom:10px;color:var(--accent);font-size:14px;font-weight:600}
+.card h4{margin-bottom:8px;color:var(--text);font-size:13px;font-weight:600}
+
+/* Tables */
 table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:left}
-th{color:var(--text2);font-weight:600;background:rgba(255,255,255,.03)}
+th,td{padding:7px 9px;border-bottom:1px solid var(--border);text-align:left}
+th{color:var(--text2);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.3px;background:rgba(255,255,255,.02)}
 tr:hover td{background:rgba(255,255,255,.02)}
-input[type=number],input[type=text],input[type=time],input[type=password],input[type=date],input[type=search],select,textarea{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 10px;font-size:13px;width:100%}
+
+/* Inputs */
+input[type=number],input[type=text],input[type=time],input[type=password],input[type=date],input[type=search],select,textarea{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-size:13px;width:100%}
 input[type=number]{width:90px}
 input[type=time]{width:100px}
 select{cursor:pointer}
 textarea{resize:vertical;min-height:60px}
-.btn{padding:8px 16px;border:none;border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{opacity:.85}
-.btn-success{background:var(--green);color:#000}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+
+/* Buttons */
+.btn{padding:7px 14px;border:none;border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:5px;transition:all .2s}
+.btn-primary{background:var(--accent);color:#0a1f2e}
+.btn-primary:hover{background:var(--accent-dark)}
+.btn-success{background:var(--green);color:#0a1f2e}
 .btn-danger{background:var(--red);color:#fff}
-.btn-warning{background:var(--yellow);color:#000}
-.btn-sm{padding:5px 10px;font-size:12px}
-.btn-outline{background:none;border:1px solid var(--border);color:var(--text)}
+.btn-warning{background:var(--yellow);color:#0a1f2e}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--text2)}
 .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
-.month-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.month-nav button{background:var(--card);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-size:14px}
+
+/* Month nav */
+.month-nav{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.month-nav button{background:var(--card-solid);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:var(--radius);cursor:pointer;font-size:13px}
 .month-nav button:hover{border-color:var(--accent);color:var(--accent)}
-.month-nav span{font-size:16px;font-weight:600;min-width:160px;text-align:center}
-.emp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
-.emp-card .emp-name{font-weight:600;font-size:15px;margin-bottom:4px}
-.emp-card .emp-pos{color:var(--text2);font-size:12px;margin-bottom:10px}
-.emp-card .emp-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;font-size:13px}
-.emp-card .emp-stats div{background:var(--bg);padding:8px;border-radius:var(--radius)}
+.month-nav span{font-size:15px;font-weight:600;min-width:160px;text-align:center}
+
+/* Employee cards */
+.emp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.emp-card .emp-name{font-weight:600;font-size:14px;margin-bottom:3px}
+.emp-card .emp-pos{color:var(--text2);font-size:12px;margin-bottom:8px}
+.emp-card .emp-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:7px;font-size:13px}
+.emp-card .emp-stats div{background:var(--input-bg);padding:7px;border-radius:var(--radius)}
 .emp-card .emp-stats .label{color:var(--text2);font-size:11px}
-.emp-card .emp-stats .val{font-weight:600;font-size:15px}
+.emp-card .emp-stats .val{font-weight:600;font-size:14px}
 .val-money{color:var(--green)}
-.val-total{color:var(--accent);font-size:17px!important}
-.fot-total{text-align:right;padding:16px;font-size:20px;font-weight:700;color:var(--accent)}
+.val-total{color:var(--accent);font-size:16px!important}
+.fot-total{text-align:right;padding:14px;font-size:18px;font-weight:700;color:var(--accent)}
 .row-btns{display:flex;gap:4px;flex-wrap:wrap}
-table{overflow-x:auto}
-.table-wrap{overflow-x:auto;border-radius:var(--radius)}
-.settings-section{margin-bottom:24px}
-.settings-section h3{margin-bottom:12px;color:var(--accent)}
-.settings-row{display:flex;gap:10px;align-items:end;margin-bottom:10px;flex-wrap:wrap}
+.table-wrap{overflow-x:auto}
+
+/* Settings */
+.settings-section{margin-bottom:20px}
+.settings-section h3,.settings-section h4{margin-bottom:10px;color:var(--accent);font-size:14px}
+.settings-row{display:flex;gap:10px;align-items:end;margin-bottom:8px;flex-wrap:wrap}
 .settings-row label{font-size:12px;color:var(--text2);min-width:100px}
 .settings-row input,.settings-row select{max-width:200px}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--green);color:var(--green);padding:12px 20px;border-radius:var(--radius);font-size:14px;z-index:9999;opacity:0;transition:opacity .3s}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card-solid);border:1px solid var(--green);color:var(--green);padding:10px 18px;border-radius:var(--radius);font-size:13px;z-index:9999;opacity:0;transition:opacity .3s}
 .toast.show{opacity:1}
-.empty-msg{color:var(--text2);text-align:center;padding:30px;font-size:14px}
-@media(max-width:600px){
-.content{padding:12px}
-.card{padding:14px}
-.emp-card .emp-stats{grid-template-columns:1fr 1fr}
-.header h1{font-size:14px}
-}
+
+.empty-msg{color:var(--text2);text-align:center;padding:24px;font-size:13px}
+
+.position-tag{display:inline-block;background:var(--input-bg);border:1px solid var(--border);padding:3px 8px;border-radius:var(--radius);margin:3px;font-size:12px}
+.position-tag .del-pos{cursor:pointer;color:var(--red);margin-left:5px}
+
 .hidden{display:none!important}
-.position-tag{display:inline-block;background:var(--bg);border:1px solid var(--border);padding:4px 10px;border-radius:var(--radius);margin:3px;font-size:13px}
-.position-tag .del-pos{cursor:pointer;color:var(--red);margin-left:6px}
+
+/* Schedule Calendar */
+.schedule-wrap{overflow-x:auto;margin-top:14px}
+.schedule-table{border-collapse:collapse;font-size:12px;min-width:100%}
+.schedule-table th,.schedule-table td{padding:4px 6px;text-align:center;border:1px solid var(--border);min-width:36px;max-width:44px;height:36px;vertical-align:middle}
+.schedule-table th.name-col{position:sticky;left:0;z-index:2;min-width:160px;max-width:180px;text-align:left;background:var(--card-solid);font-weight:600;color:var(--text);font-size:12px;border-right:2px solid var(--border)}
+.schedule-table td.name-col{position:sticky;left:0;z-index:2;min-width:160px;max-width:180px;text-align:left;background:var(--card-solid);font-weight:500;font-size:12px;border-right:2px solid var(--border)}
+.schedule-table .day-header{font-size:11px;position:relative}
+.schedule-table .day-header.weekend{background:rgba(248,113,113,0.12);color:var(--red)}
+.schedule-table .day-header.today{background:rgba(45,212,191,0.15);box-shadow:inset 0 -2px 0 var(--accent)}
+.schedule-table .day-num{font-weight:600;font-size:12px}
+.schedule-table .day-name{font-size:10px;color:var(--text2)}
+.schedule-table .shift-cell{cursor:pointer;transition:background .15s;position:relative}
+.schedule-table .shift-cell:hover{background:rgba(45,212,191,0.12)}
+.schedule-table .shift-cell.working{background:rgba(52,211,153,0.2)}
+.schedule-table .shift-cell.half1{background:rgba(251,191,36,0.15)}
+.schedule-table .shift-cell.half2{background:rgba(45,212,191,0.2)}
+.schedule-table .shift-cell.weekend{background:rgba(248,113,113,0.06)}
+.schedule-table .shift-cell.working.weekend{background:rgba(52,211,153,0.15)}
+.schedule-table .shift-cell .shift-label{font-size:10px;font-weight:500}
+.schedule-table .shift-cell .shift-label.full-label{color:var(--green)}
+.schedule-table .shift-cell .shift-label.half1-label{color:var(--yellow)}
+.schedule-table .shift-cell .shift-label.half2-label{color:var(--accent)}
+.schedule-controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+
+/* Role badge */
+.role-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600}
+.role-badge.owner{background:rgba(45,212,191,0.2);color:var(--accent)}
+.role-badge.manager{background:rgba(52,211,153,0.2);color:var(--green)}
+.role-badge.admin{background:rgba(251,191,36,0.2);color:var(--yellow)}
+.role-badge.none{background:rgba(148,163,184,0.15);color:var(--text2)}
+
+@media(max-width:600px){
+  .content{padding:12px}
+  .card{padding:12px}
+  .emp-card .emp-stats{grid-template-columns:1fr 1fr}
+  .header h1{font-size:14px}
+  .schedule-table th,.schedule-table td{min-width:30px;padding:3px 4px}
+}
 </style>
 </head>
 <body>
@@ -96,7 +172,7 @@ const LS={
 function initDefaults(){
   if(!LS.get('zp_employees')){
     const emps=[
-      {id:1,name:'Мелоян Карен Наирович',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:30,active:true},
+      {id:1,name:'Мелоян Карен Наирович',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:30,active:true,appRole:'owner',login:'karen',pass:'zemskiy2026'},
       {id:2,name:'Баласанян Амаля Арамовна',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:25,active:true},
       {id:3,name:'Кялоян Мгер Шаваршович',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:30,active:true},
       {id:4,name:'Сидорейко Илья Михайлович',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:25,active:true},
@@ -109,10 +185,10 @@ function initDefaults(){
       {id:11,name:'Собиров Азим',position:'Ассистент',calcType:'fixed_day',fixedDay:5000,fixedMonth:0,percent:0,active:true},
       {id:12,name:'Максименко Надежда Петровна',position:'Другое',calcType:'fixed_month',fixedDay:0,fixedMonth:12000,percent:0,active:true},
       {id:13,name:'Москалева',position:'Другое',calcType:'fixed_month',fixedDay:0,fixedMonth:30000,percent:0,active:true},
-      {id:14,name:'Азарко Оксана Владимировна',position:'Управляющий',calcType:'fixed_month',fixedDay:0,fixedMonth:30000,percent:0,active:true},
+      {id:14,name:'Азарко Оксана Владимировна',position:'Управляющий',calcType:'fixed_month',fixedDay:0,fixedMonth:30000,percent:0,active:true,appRole:'manager',login:'manager',pass:'manager123'},
       {id:15,name:'Титяева Оксана Дмитриевна',position:'Ассистент',calcType:'fixed_day',fixedDay:500,fixedMonth:0,percent:0,active:true},
       {id:16,name:'Скобелева Юлия Сергеевна',position:'Ассистент',calcType:'fixed_day',fixedDay:500,fixedMonth:0,percent:0,active:true},
-      {id:17,name:'Линникова Виктория Михайловна',position:'Администратор',calcType:'fixed_day',fixedDay:500,fixedMonth:0,percent:0,active:true}
+      {id:17,name:'Линникова Виктория Михайловна',position:'Администратор',calcType:'fixed_day',fixedDay:500,fixedMonth:0,percent:0,active:true,appRole:'admin',login:'admin',pass:'admin123'}
     ];
     LS.set('zp_employees',emps);
   }
@@ -127,6 +203,7 @@ initDefaults();
 
 let state={
   role:null,
+  empId:null,
   tab:'daily',
   month:new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0'),
   reportDate:todayStr()
@@ -134,7 +211,7 @@ let state={
 
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 
-function empId(){const emps=LS.get('zp_employees',[]);return emps.length?Math.max(...emps.map(e=>e.id))+1:1}
+function empIdGen(){const emps=LS.get('zp_employees',[]);return emps.length?Math.max(...emps.map(e=>e.id))+1:1}
 
 function toast(msg){
   const t=document.getElementById('toast');
@@ -180,6 +257,17 @@ function monthName(ym){
   return months[(parseInt(ym.split('-')[1]))-1]+' '+ym.split('-')[0];
 }
 
+function isDoctor(emp){
+  return emp.position.includes('Врач');
+}
+
+function roleLabel(r){
+  if(r==='owner')return 'Владелец';
+  if(r==='manager')return 'Управляющая';
+  if(r==='admin')return 'Администратор';
+  return '';
+}
+
 function render(){
   const app=document.getElementById('app');
   const session=LS.get('zp_session',null);
@@ -188,11 +276,13 @@ function render(){
     bindLogin();
   } else {
     state.role=session.role;
+    state.empId=session.empId||null;
     app.innerHTML=renderApp();
     bindApp();
   }
 }
 
+// ========== LOGIN ==========
 function renderLogin(){
   return `<div class="login-wrap"><div class="login-box">
     <h2>🏥 Земский доктор</h2>
@@ -212,15 +302,33 @@ function bindLogin(){
 function doLogin(){
   const login=document.getElementById('login-input').value.trim();
   const pass=document.getElementById('pass-input').value;
+  if(!login||!pass){toast('Введите логин и пароль');return}
+
+  // Check legacy zp_creds first
   const creds=LS.get('zp_creds',{});
   let role=null;
   for(const[r,c] of Object.entries(creds)){
     if(c.login===login&&c.pass===pass){role=r;break}
   }
+
+  // Check employee-based credentials
+  let empMatchId=null;
+  if(!role){
+    const emps=getEmps();
+    for(const e of emps){
+      if(e.appRole&&e.appRole!=='none'&&e.login===login&&e.pass===pass){
+        role=e.appRole;
+        empMatchId=e.id;
+        break;
+      }
+    }
+  }
+
   if(!role){toast('Неверный логин или пароль');return}
-  LS.set('zp_session',{login,role});
+  LS.set('zp_session',{login,role,empId:empMatchId});
   addHistory('Вход: '+login+' ('+role+')');
   state.role=role;
+  state.empId=empMatchId;
   if(role==='owner')state.tab='daily';
   else if(role==='manager')state.tab='daily';
   else state.tab='report';
@@ -230,21 +338,25 @@ function doLogin(){
 function logout(){
   LS.del('zp_session');
   state.role=null;
+  state.empId=null;
   render();
 }
 
+// ========== TABS ==========
 function getTabs(){
   const r=state.role;
   if(r==='owner')return[
     {id:'daily',icon:'📅',label:'Ввод за день'},
     {id:'monthly',icon:'📊',label:'Расчёт за месяц'},
+    {id:'schedule',icon:'🗓',label:'График'},
     {id:'admin-report',icon:'📑',label:'Отчёт администратора'},
     {id:'employees',icon:'👥',label:'Сотрудники'},
     {id:'settings',icon:'⚙️',label:'Настройки'}
   ];
   if(r==='manager')return[
     {id:'daily',icon:'📅',label:'Ввод за день'},
-    {id:'monthly',icon:'📊',label:'Расчёт за месяц'}
+    {id:'monthly',icon:'📊',label:'Расчёт за месяц'},
+    {id:'schedule',icon:'🗓',label:'График'}
   ];
   return[{id:'report',icon:'📋',label:'Мой отчёт'}];
 }
@@ -252,20 +364,19 @@ function getTabs(){
 function renderApp(){
   const tabs=getTabs();
   if(!tabs.find(t=>t.id===state.tab))state.tab=tabs[0].id;
-  let tabsHtml=`<div class="header"><h1>🏥 Земский доктор-стоматолог</h1><div class="user-info">${state.role==='owner'?'Владелец':state.role==='manager'?'Управляющая':'Администратор'} (${LS.get('zp_session',{}).login||''})<button onclick="logout()">Выйти</button></div></div>`;
-  tabsHtml+=`<div class="tabs">`;
+  let html=`<div class="header"><h1>🏥 Земский доктор-стоматолог</h1><div class="user-info">${roleLabel(state.role)} (${LS.get('zp_session',{}).login||''})<button onclick="logout()">Выйти</button></div></div>`;
+  html+=`<div class="tabs">`;
   for(const t of tabs){
-    tabsHtml+=`<button class="${t.id===state.tab?'active':''}" data-tab="${t.id}">${t.icon} ${t.label}</button>`;
+    html+=`<button class="${t.id===state.tab?'active':''}" data-tab="${t.id}">${t.icon} ${t.label}</button>`;
   }
-  tabsHtml+=`</div><div class="content">`;
-  tabsHtml+=renderTab();
-  tabsHtml+=`</div>`;
-  return tabsHtml;
+  html+=`</div><div class="content">${renderTab()}</div>`;
+  return html;
 }
 
 function renderTab(){
   if(state.tab==='daily')return renderDaily();
   if(state.tab==='monthly')return renderMonthly();
+  if(state.tab==='schedule')return renderSchedule();
   if(state.tab==='admin-report')return renderAdminReportView();
   if(state.tab==='employees')return renderEmployees();
   if(state.tab==='settings')return renderSettings();
@@ -285,6 +396,7 @@ function bindApp(){
 function bindTabContent(){
   if(state.tab==='daily')bindDaily();
   if(state.tab==='monthly')bindMonthly();
+  if(state.tab==='schedule')bindSchedule();
   if(state.tab==='admin-report')bindAdminReportView();
   if(state.tab==='employees')bindEmployees();
   if(state.tab==='settings')bindSettings();
@@ -296,22 +408,23 @@ function renderDaily(){
   const today=todayStr();
   const emps=getActiveEmps();
   const data=LS.get('zp_daily_'+today,{});
+  const isOwner=state.role==='owner';
   let html=`<div class="card"><h3>📅 Ввод данных за день</h3>
-    <div style="margin-bottom:16px"><label>Дата: </label><input type="date" id="daily-date" value="${today}"></div>
+    <div style="margin-bottom:14px"><label>Дата: </label><input type="date" id="daily-date" value="${today}"></div>
     <div class="table-wrap"><table>
-    <tr><th>Сотрудник</th><th>Должность</th><th>Смен/дней</th>${state.role==='owner'?'<th>Выручка ₽</th>':''}<th>Пациентов</th></tr>`;
+    <tr><th>Сотрудник</th><th>Должность</th><th>Смен/дней</th>${isOwner?'<th>Выручка ₽</th>':''}<th>Пациентов</th></tr>`;
   for(const e of emps){
     if(e.calcType==='fixed_month')continue;
     const d=data[e.id]||{};
     html+=`<tr data-emp="${e.id}">
       <td>${e.name}</td><td>${e.position}</td>
       <td><input type="number" class="daily-worked" data-id="${e.id}" value="${d.worked||0}" min="0" step="0.5"></td>
-      ${state.role==='owner'?`<td><input type="number" class="daily-revenue" data-id="${e.id}" value="${d.revenue||0}" min="0"></td>`:''}
+      ${isOwner?`<td><input type="number" class="daily-revenue" data-id="${e.id}" value="${d.revenue||0}" min="0"></td>`:''}
       <td><input type="number" class="daily-patients" data-id="${e.id}" value="${d.patients||0}" min="0"></td>
     </tr>`;
   }
   html+=`</table></div>
-    <button class="btn btn-success" id="save-daily" style="margin-top:16px">💾 Сохранить</button>
+    <button class="btn btn-success" id="save-daily" style="margin-top:14px">💾 Сохранить</button>
   </div>`;
   return html;
 }
@@ -365,14 +478,14 @@ function renderMonthly(){
     totalRevAll+=totalOwnRevenue;
 
     html+=`<div class="emp-card">
-      <div class="emp-name">${emp.name}${emp.active?'':' (неактив)'}</div>
+      <div class="emp-name">${emp.name}</div>
       <div class="emp-pos">${emp.position} · ${emp.calcType.replace(/_/g,' ')}</div>
       <div class="emp-stats">
         <div><div class="label">Дней/смен</div><div class="val">${totalWorked}</div></div>
         ${isOwner?`<div><div class="label">Выручка ₽</div><div class="val val-money">${totalOwnRevenue.toLocaleString('ru')}</div></div>`:''}
         <div><div class="label">Пациентов</div><div class="val">${totalPatients}</div></div>
         <div><div class="label">Начислено ₽</div><div class="val val-money">${salary.toLocaleString('ru')}</div></div>
-        ${isOwner?`<div><div class="label">Аванс ₽</div><div class="val"><input type="number" class="advance-input" data-id="${emp.id}" value="${advance}" min="0" style="width:90px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px"></div></div>`:`<div><div class="label">Аванс ₽</div><div class="val">${advance.toLocaleString('ru')}</div></div>`}
+        ${isOwner?`<div><div class="label">Аванс ₽</div><div class="val"><input type="number" class="advance-input" data-id="${emp.id}" value="${advance}" min="0" style="width:80px"></div></div>`:`<div><div class="label">Аванс ₽</div><div class="val">${advance.toLocaleString('ru')}</div></div>`}
         <div><div class="label">К выдаче ₽</div><div class="val val-total">${toPay.toLocaleString('ru')}</div></div>
       </div>
     </div>`;
@@ -433,10 +546,126 @@ function exportCSV(){
   toast('CSV экспортирован');
 }
 
+// ========== SCHEDULE CALENDAR ==========
+function renderSchedule(){
+  const[y,m]=state.month.split('-').map(Number);
+  const daysInMonth=new Date(y,m,0).getDate();
+  const dayNames=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const emps=getActiveEmps();
+  const scheduleKey='zp_schedule_'+state.month.replace('-','_');
+  const schedule=LS.get(scheduleKey,{});
+  const today=todayStr();
+
+  let html=`<div class="card"><h3>🗓 График работы</h3>
+    <div class="schedule-controls">
+      <button id="sch-prev-month">◀</button>
+      <span style="font-weight:600">${monthName(state.month)}</span>
+      <button id="sch-next-month">▶</button>
+      <button class="btn btn-success btn-sm" id="save-schedule" style="margin-left:auto">💾 Сохранить график</button>
+    </div>`;
+
+  html+=`<div class="schedule-wrap"><table class="schedule-table"><thead><tr><th class="name-col">Сотрудник</th>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const dateObj=new Date(y,m-1,d);
+    const dow=dateObj.getDay();
+    const mappedDow=dow===0?6:dow-1;
+    const isWeekend=dow===0||dow===6;
+    const isToday=fmtDate(dateObj)===today;
+    let cls='day-header';
+    if(isWeekend)cls+=' weekend';
+    if(isToday)cls+=' today';
+    html+=`<th class="${cls}"><div class="day-num">${d}</div><div class="day-name">${dayNames[mappedDow]}</div></th>`;
+  }
+  html+=`</tr></thead><tbody>`;
+
+  for(const emp of emps){
+    const empSch=schedule[emp.id]||{};
+    const doc=isDoctor(emp);
+    html+=`<tr><td class="name-col">${emp.name}${doc?' 👨‍⚕️':''}</td>`;
+    for(let d=1;d<=daysInMonth;d++){
+      const dateObj=new Date(y,m-1,d);
+      const dow=dateObj.getDay();
+      const isWeekend=dow===0||dow===6;
+      const val=empSch[d]||'';
+      let cls='shift-cell';
+      if(val==='full')cls+=' working';
+      else if(val==='half1')cls+=' half1';
+      else if(val==='half2')cls+=' half2';
+      if(isWeekend)cls+=' weekend';
+      let label='';
+      if(val==='full')label='<span class="shift-label full-label">●</span>';
+      else if(val==='half1')label='<span class="shift-label half1-label">½</span>';
+      else if(val==='half2')label='<span class="shift-label half2-label">½</span>';
+      html+=`<td class="${cls}" data-emp="${emp.id}" data-day="${d}" title="${emp.name} — день ${d}">${label}</td>`;
+    }
+    html+=`</tr>`;
+  }
+
+  html+=`</tbody></table></div></div>`;
+  return html;
+}
+
+function bindSchedule(){
+  const prev=document.getElementById('sch-prev-month');
+  const next=document.getElementById('sch-next-month');
+  const save=document.getElementById('save-schedule');
+
+  if(prev)prev.onclick=()=>{
+    const[y,m]=state.month.split('-').map(Number);
+    let nm=m-1,ny=y;if(nm<1){nm=12;ny--}
+    state.month=ny+'-'+String(nm).padStart(2,'0');
+    render();
+  };
+  if(next)next.onclick=()=>{
+    const[y,m]=state.month.split('-').map(Number);
+    let nm=m+1,ny=y;if(nm>12){nm=1;ny++}
+    state.month=ny+'-'+String(nm).padStart(2,'0');
+    render();
+  };
+
+  // Click cells to toggle shift type
+  document.querySelectorAll('.shift-cell').forEach(cell=>{
+    cell.onclick=()=>{
+      const empId=parseInt(cell.dataset.emp);
+      const day=parseInt(cell.dataset.day);
+      const emp=getEmps().find(e=>e.id===empId);
+      const doc=emp&&isDoctor(emp);
+
+      const scheduleKey='zp_schedule_'+state.month.replace('-','_');
+      const schedule=LS.get(scheduleKey,{});
+      if(!schedule[empId])schedule[empId]={};
+      const cur=schedule[empId][day]||'';
+
+      if(doc){
+        // Doctor: cycle through none → full → half1 → half2 → none
+        const cycle=['','full','half1','half2'];
+        const idx=cycle.indexOf(cur);
+        const next=(idx+1)%cycle.length;
+        if(next===0)delete schedule[empId][day];
+        else schedule[empId][day]=cycle[next];
+      } else {
+        // Non-doctor: toggle working/not
+        if(cur){delete schedule[empId][day]}
+        else{schedule[empId][day]='full'}
+      }
+
+      LS.set(scheduleKey,schedule);
+      render();
+    };
+  });
+
+  if(save){
+    save.onclick=()=>{
+      toast('График сохранён');
+      addHistory('Сохранён график за '+state.month);
+    };
+  }
+}
+
 // ========== ADMIN REPORT VIEW (owner) ==========
 function renderAdminReportView(){
   let html=`<div class="card"><h3>📑 Отчёт администратора</h3>
-    <div style="margin-bottom:16px"><label>Дата: </label><input type="date" id="admin-report-date" value="${state.reportDate}"></div>
+    <div style="margin-bottom:14px"><label>Дата: </label><input type="date" id="admin-report-date" value="${state.reportDate}"></div>
     <div id="admin-report-content"></div>
   </div>`;
   return html;
@@ -462,7 +691,7 @@ function renderReportReadonly(data){
   }
   html+='</table></div>';
 
-  html+='<h4 style="margin:16px 0 8px">Приём пациентов и оплата</h4><div class="table-wrap"><table><tr><th>Пациент</th><th>Врач</th><th>Услуга</th><th>Нал ₽</th><th>Безнал ₽</th><th>Способ</th><th>Итого</th></tr>';
+  html+='<h4 style="margin:14px 0 8px">Приём пациентов и оплата</h4><div class="table-wrap"><table><tr><th>Пациент</th><th>Врач</th><th>Услуга</th><th>Нал ₽</th><th>Безнал ₽</th><th>Способ</th><th>Итого</th></tr>';
   let tNal=0,tBez=0;
   for(const p of(data.patients||[])){
     tNal+=p.cash||0;tBez+=p.cashless||0;
@@ -471,7 +700,7 @@ function renderReportReadonly(data){
   html+=`<tr style="font-weight:700;color:var(--green)"><td colspan=3>ИТОГО</td><td>${tNal.toLocaleString('ru')}</td><td>${tBez.toLocaleString('ru')}</td><td></td><td>${(tNal+tBez).toLocaleString('ru')}</td></tr>`;
   html+=`</table></div>`;
 
-  html+='<h4 style="margin:16px 0 8px">Расходы за день</h4><div class="table-wrap"><table><tr><th>Категория</th><th>Описание</th><th>Кому/Куда</th><th>Сумма ₽</th><th>Нал/Безнал</th><th>Документ</th><th>Примечание</th></tr>';
+  html+='<h4 style="margin:14px 0 8px">Расходы за день</h4><div class="table-wrap"><table><tr><th>Категория</th><th>Описание</th><th>Кому/Куда</th><th>Сумма ₽</th><th>Нал/Безнал</th><th>Документ</th><th>Примечание</th></tr>';
   let tExp=0;
   for(const e of(data.expenses||[])){
     tExp+=e.amount||0;
@@ -498,7 +727,7 @@ function renderAdminForm(){
   }
   html+=`</table></div><button class="btn btn-outline btn-sm" id="add-shift" style="margin-top:8px">+ Добавить строку</button>`;
 
-  html+=`<h4 style="margin:20px 0 8px">Приём пациентов и оплата</h4>
+  html+=`<h4 style="margin:18px 0 8px">Приём пациентов и оплата</h4>
     <div class="table-wrap"><table id="patients-table">
     <tr><th>Пациент</th><th>Врач</th><th>Услуга</th><th>Нал ₽</th><th>Безнал ₽</th><th>Способ</th><th>Итого</th><th></th></tr>`;
   for(const p of data.patients){
@@ -508,7 +737,7 @@ function renderAdminForm(){
     <div id="patients-totals" style="text-align:right;margin-top:8px;font-weight:600;color:var(--green)"></div>
     <button class="btn btn-outline btn-sm" id="add-patient" style="margin-top:8px">+ Добавить пациента</button>`;
 
-  html+=`<h4 style="margin:20px 0 8px">Расходы за день</h4>
+  html+=`<h4 style="margin:18px 0 8px">Расходы за день</h4>
     <div class="table-wrap"><table id="expenses-table">
     <tr><th>Категория</th><th>Описание</th><th>Кому/Куда</th><th>Сумма ₽</th><th>Нал/Безнал</th><th>Документ</th><th>Примечание</th><th></th></tr>`;
   for(const e of data.expenses){
@@ -518,7 +747,7 @@ function renderAdminForm(){
     <div id="expenses-total" style="text-align:right;margin-top:8px;font-weight:600;color:var(--red)"></div>
     <button class="btn btn-outline btn-sm" id="add-expense" style="margin-top:8px">+ Добавить расход</button>`;
 
-  html+=`<div style="margin-top:24px"><button class="btn btn-success" id="save-report">💾 Сохранить отчёт</button></div></div>`;
+  html+=`<div style="margin-top:20px"><button class="btn btn-success" id="save-report">💾 Сохранить отчёт</button></div></div>`;
 
   return html;
 }
@@ -705,12 +934,17 @@ let showAddEmp=false;
 function renderEmployees(){
   const emps=getEmps();
   const positions=getPositions();
+  const editingEmp=empEditId?emps.find(e=>e.id===empEditId):null;
+  const currentRole=editingEmp?editingEmp.appRole||'none':'none';
+  const currentLogin=editingEmp?(editingEmp.login||''):'';
+  const currentPass=editingEmp?(editingEmp.pass||''):'';
+
   let html=`<div class="card"><h3>👥 Сотрудники (${emps.length})</h3>
-    <button class="btn btn-primary btn-sm" id="toggle-add-emp" style="margin-bottom:16px">+ Добавить сотрудника</button>
-    <div id="add-emp-form" class="${showAddEmp?'':'hidden'}" style="margin-bottom:20px">
-      <div class="card" style="background:var(--bg)">
+    <button class="btn btn-primary btn-sm" id="toggle-add-emp" style="margin-bottom:14px">+ Добавить сотрудника</button>
+    <div id="add-emp-form" class="${showAddEmp?'':'hidden'}" style="margin-bottom:18px">
+      <div class="card" style="background:var(--input-bg)">
         <h4 id="emp-form-title">Новый сотрудник</h4>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:12px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:10px">
           <div><label style="font-size:12px;color:var(--text2)">ФИО</label><input type="text" id="emp-fio"></div>
           <div><label style="font-size:12px;color:var(--text2)">Должность</label><select id="emp-position">${positions.map(p=>`<option value="${p}">${p}</option>`).join('')}<option value="__new__">+ Новая должность...</option></select><input type="text" id="emp-position-new" style="display:none;margin-top:4px" placeholder="Новая должность"></div>
           <div><label style="font-size:12px;color:var(--text2)">Тип расчёта</label><select id="emp-calc">
@@ -724,16 +958,27 @@ function renderEmployees(){
           <div><label style="font-size:12px;color:var(--text2)">Фикс за смену ₽</label><input type="number" id="emp-fixed-day" value="0" min="0"></div>
           <div><label style="font-size:12px;color:var(--text2)">Фикс за месяц ₽</label><input type="number" id="emp-fixed-month" value="0" min="0"></div>
           <div><label style="font-size:12px;color:var(--text2)">Процент %</label><input type="number" id="emp-percent" value="0" min="0" max="100"></div>
+          <div><label style="font-size:12px;color:var(--text2)">Роль в приложении</label><select id="emp-app-role">
+            <option value="none" ${currentRole==='none'?'selected':''}>Нет доступа</option>
+            <option value="owner" ${currentRole==='owner'?'selected':''}>Владелец (полный доступ)</option>
+            <option value="manager" ${currentRole==='manager'?'selected':''}>Управляющая (ввод + зарплаты)</option>
+            <option value="admin" ${currentRole==='admin'?'selected':''}>Администратор (отчёт за сегодня)</option>
+          </select></div>
+          <div id="emp-cred-fields"><label style="font-size:12px;color:var(--text2)">Логин</label><input type="text" id="emp-login" value="${currentLogin}" placeholder="Логин для входа"></div>
+          <div id="emp-pass-fields"><label style="font-size:12px;color:var(--text2)">Пароль</label><input type="password" id="emp-pass" value="${currentPass}" placeholder="Пароль для входа"></div>
         </div>
         <button class="btn btn-success btn-sm" id="save-emp">💾 Сохранить</button>
         <button class="btn btn-outline btn-sm" id="cancel-emp" style="margin-left:8px">Отмена</button>
       </div>
     </div>
     <div class="table-wrap"><table>
-    <tr><th>ФИО</th><th>Должность</th><th>Тип расчёта</th><th>Фикс/день</th><th>Фикс/мес</th><th>%</th><th>Статус</th><th></th></tr>`;
+    <tr><th>ФИО</th><th>Должность</th><th>Тип расчёта</th><th>Фикс/день</th><th>Фикс/мес</th><th>%</th><th>Роль</th><th>Статус</th><th></th></tr>`;
   for(const e of emps){
+    const roleCls=e.appRole&&e.appRole!=='none'?e.appRole:'none';
+    const roleText=e.appRole&&e.appRole!=='none'?roleLabel(e.appRole):'—';
     html+=`<tr><td>${e.name}</td><td>${e.position}</td><td>${e.calcType.replace(/_/g,' ')}</td>
       <td>${e.fixedDay||''}</td><td>${e.fixedMonth||''}</td><td>${e.percent||''}</td>
+      <td><span class="role-badge ${roleCls}">${roleText}</span></td>
       <td><span style="color:${e.active?'var(--green)':'var(--red)'}">${e.active?'Активен':'Неактивен'}</span></td>
       <td class="row-btns">
         <button class="btn btn-outline btn-sm edit-emp" data-id="${e.id}">✏️</button>
@@ -744,11 +989,10 @@ function renderEmployees(){
   html+=`</table></div></div>`;
 
   html+=`<div class="card"><h3>📌 Должности</h3>
-    <div style="margin-bottom:12px;display:flex;gap:8px">
+    <div style="margin-bottom:10px;display:flex;gap:8px">
       <input type="text" id="new-position" placeholder="Новая должность" style="max-width:200px">
       <button class="btn btn-primary btn-sm" id="add-position">+</button>
-    </div>
-    <div>`;
+    </div><div>`;
   for(const p of positions){
     const hasEmp=emps.some(e=>e.position===p);
     html+=`<span class="position-tag">${p}${!hasEmp?` <span class="del-pos" data-pos="${p}" title="Удалить">✕</span>`:''}</span>`;
@@ -765,6 +1009,19 @@ function bindEmployees(){
     empEditId=null;
     render();
   };
+
+  // Show/hide login/pass fields based on role
+  const roleSelect=document.getElementById('emp-app-role');
+  function toggleCredFields(){
+    const role=roleSelect?roleSelect.value:'none';
+    const credFields=document.getElementById('emp-cred-fields');
+    const passFields=document.getElementById('emp-pass-fields');
+    const show=role&&role!=='none';
+    if(credFields)credFields.style.display=show?'':'none';
+    if(passFields)passFields.style.display=show?'':'none';
+  }
+  if(roleSelect)roleSelect.onchange=toggleCredFields;
+  toggleCredFields();
 
   const posSel=document.getElementById('emp-position');
   if(posSel)posSel.onchange=()=>{
@@ -786,6 +1043,11 @@ function bindEmployees(){
     }
     const name=document.getElementById('emp-fio').value.trim();
     if(!name){toast('Введите ФИО');return}
+    const appRole=document.getElementById('emp-app-role').value;
+    const login=appRole!=='none'?(document.getElementById('emp-login').value.trim()):'';
+    const pass=appRole!=='none'?(document.getElementById('emp-pass').value):'';
+    if(appRole!=='none'&&(!login||!pass)){toast('Укажите логин и пароль для роли с доступом');return}
+
     const obj={
       name,
       position,
@@ -793,15 +1055,22 @@ function bindEmployees(){
       fixedDay:parseInt(document.getElementById('emp-fixed-day').value)||0,
       fixedMonth:parseInt(document.getElementById('emp-fixed-month').value)||0,
       percent:parseInt(document.getElementById('emp-percent').value)||0,
-      active:true
+      active:true,
+      appRole:appRole==='none'?undefined:appRole,
+      login:login||undefined,
+      pass:pass||undefined
     };
     const emps=getEmps();
     if(empEditId){
       const idx=emps.findIndex(e=>e.id===empEditId);
-      if(idx>=0){obj.id=empEditId;obj.active=emps[idx].active;emps[idx]=obj}
+      if(idx>=0){
+        obj.id=empEditId;
+        obj.active=emps[idx].active;
+        emps[idx]=obj;
+      }
       addHistory('Изменён сотрудник: '+name);
     }else{
-      obj.id=empId();
+      obj.id=empIdGen();
       emps.push(obj);
       addHistory('Добавлен сотрудник: '+name);
     }
@@ -818,11 +1087,28 @@ function bindEmployees(){
       showAddEmp=true;render();
       setTimeout(()=>{
         document.getElementById('emp-fio').value=emp.name;
+        const posSel=document.getElementById('emp-position');
+        // Try to set position; if not found, it's custom
+        const posOpts=Array.from(posSel.options).map(o=>o.value);
+        if(posOpts.includes(emp.position)){posSel.value=emp.position}
+        else{
+          posSel.value='__new__';
+          document.getElementById('emp-position-new').style.display='block';
+          document.getElementById('emp-position-new').value=emp.position;
+        }
         document.getElementById('emp-calc').value=emp.calcType;
         document.getElementById('emp-fixed-day').value=emp.fixedDay;
         document.getElementById('emp-fixed-month').value=emp.fixedMonth;
         document.getElementById('emp-percent').value=emp.percent;
+        document.getElementById('emp-app-role').value=emp.appRole||'none';
+        document.getElementById('emp-login').value=emp.login||'';
+        document.getElementById('emp-pass').value=emp.pass||'';
         document.getElementById('emp-form-title').textContent='Редактирование: '+emp.name;
+        // Trigger visibility update for cred fields
+        const roleSelect=document.getElementById('emp-app-role');
+        const show=roleSelect.value&&roleSelect.value!=='none';
+        document.getElementById('emp-cred-fields').style.display=show?'':'none';
+        document.getElementById('emp-pass-fields').style.display=show?'':'none';
       },50);
     };
   });
@@ -909,9 +1195,7 @@ function bindSettings(){
   };
   const expBtn=document.getElementById('export-json');
   if(expBtn)expBtn.onclick=()=>{
-    const allKeys=['zp_employees','zp_positions','zp_creds','zp_history'];
     const data={};
-    // Collect daily data
     for(let i=0;i<localStorage.length;i++){
       const k=localStorage.key(i);
       if(k.startsWith('zp_'))data[k]=LS.get(k);
@@ -946,7 +1230,6 @@ function bindSettings(){
   };
 }
 
-// Make logout global
 window.logout=logout;
 
 render();
