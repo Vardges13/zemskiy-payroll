@@ -924,16 +924,22 @@ function calcReportTotals(){
 // ========== EMPLOYEES ==========
 let empEditId=null;
 let showAddEmp=false;
+let empSearchQ='';
 
 function renderEmployees(){
-  const emps=getEmps();
+  const emps=getEmps().filter(e=>{
+    if(!empSearchQ)return true;
+    const q=empSearchQ.toLowerCase();
+    return e.name.toLowerCase().includes(q)||e.position.toLowerCase().includes(q);
+  });
   const positions=getPositions();
   const editingEmp=empEditId?emps.find(e=>e.id===empEditId):null;
   const currentRole=editingEmp?editingEmp.appRole||'none':'none';
   const currentLogin=editingEmp?(editingEmp.login||''):'';
   const currentPass=editingEmp?(editingEmp.pass||''):'';
 
-  let html=`<div class="card"><h3>👥 Сотрудники (${emps.length})</h3>
+  let html=`<div class="card"><h3>👥 Сотрудники (${getEmps().length})</h3>
+    <div style="margin-bottom:12px"><input type="text" id="emp-search" placeholder="🔍 Поиск по ФИО или должности..." value="${empSearchQ}" style="width:100%;max-width:320px;padding:10px 14px;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:14px"></div>
     <button class="btn btn-primary btn-sm" id="toggle-add-emp" style="margin-bottom:14px">+ Добавить сотрудника</button>
     <div id="add-emp-form" class="${showAddEmp?'':'hidden'}" style="margin-bottom:18px">
       <div class="card" style="background:var(--input-bg)">
@@ -952,27 +958,32 @@ function renderEmployees(){
           <div><label style="font-size:12px;color:var(--text2)">Фикс за смену ₽</label><input type="number" id="emp-fixed-day" value="0" min="0"></div>
           <div><label style="font-size:12px;color:var(--text2)">Фикс за месяц ₽</label><input type="number" id="emp-fixed-month" value="0" min="0"></div>
           <div><label style="font-size:12px;color:var(--text2)">Процент %</label><input type="number" id="emp-percent" value="0" min="0" max="100"></div>
-          <div><label style="font-size:12px;color:var(--text2)">Роль в приложении</label><select id="emp-app-role">
-            <option value="none" ${currentRole==='none'?'selected':''}>Нет доступа</option>
-            <option value="owner" ${currentRole==='owner'?'selected':''}>Владелец (полный доступ)</option>
-            <option value="manager" ${currentRole==='manager'?'selected':''}>Управляющая (ввод + зарплаты)</option>
-            <option value="admin" ${currentRole==='admin'?'selected':''}>Администратор (отчёт за сегодня)</option>
-          </select></div>
-          <div id="emp-cred-fields"><label style="font-size:12px;color:var(--text2)">Логин</label><input type="text" id="emp-login" value="${currentLogin}" placeholder="Логин для входа"></div>
-          <div id="emp-pass-fields"><label style="font-size:12px;color:var(--text2)">Пароль</label><input type="password" id="emp-pass" value="${currentPass}" placeholder="Пароль для входа"></div>
+          <div><label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="emp-can-login" ${currentRole!=='none'?'checked':''}> Вход в приложение</label></div>
+          <div id="emp-cred-fields" style="${currentRole==='none'?'display:none':''}"><label style="font-size:12px;color:var(--text2)">Логин</label><input type="text" id="emp-login" value="${currentLogin}" placeholder="Логин"></div>
+          <div id="emp-pass-fields" style="${currentRole==='none'?'display:none':''}"><label style="font-size:12px;color:var(--text2)">Пароль</label><input type="password" id="emp-pass" value="${currentPass}" placeholder="Пароль"></div>
+          <div id="emp-perms-section" style="grid-column:1/-1;${currentRole==='none'?'display:none':''}"><label style="font-size:13px;color:var(--accent);font-weight:600;display:block;margin-bottom:8px">🔒 Права доступа</label><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px">
+            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="perm-see-salaries" class="emp-perm" data-perm="seeSalaries" ${editingEmp&&editingEmp.permissions&&editingEmp.permissions.seeSalaries?'checked':''}> 👁 Видеть зарплаты</label>
+            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="perm-see-revenue" class="emp-perm" data-perm="seeRevenue" ${editingEmp&&editingEmp.permissions&&editingEmp.permissions.seeRevenue?'checked':''}> 👁 Видеть выручку</label>
+            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="perm-see-schedule" class="emp-perm" data-perm="seeSchedule" ${editingEmp&&editingEmp.permissions&&editingEmp.permissions.seeSchedule?'checked':''}> 👁 Видеть график</label>
+            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="perm-see-expenses" class="emp-perm" data-perm="seeExpenses" ${editingEmp&&editingEmp.permissions&&editingEmp.permissions.seeExpenses?'checked':''}> 👁 Видеть расходы</label>
+            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="perm-can-input" class="emp-perm" data-perm="canInput" ${editingEmp&&editingEmp.permissions&&editingEmp.permissions.canInput?'checked':''}> ✏️ Вводить данные</label>
+            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="perm-can-report" class="emp-perm" data-perm="canFillReport" ${editingEmp&&editingEmp.permissions&&editingEmp.permissions.canFillReport?'checked':''}> ✏️ Заполнять отчёт</label>
+            <label style="font-size:12px;color:var(--accent);display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600"><input type="checkbox" id="perm-is-owner" class="emp-perm" data-perm="isOwner" ${editingEmp&&editingEmp.permissions&&editingEmp.permissions.isOwner?'checked':''}> ⭐ Полный доступ</label>
+          </div></div>
         </div>
         <button class="btn btn-success btn-sm" id="save-emp">💾 Сохранить</button>
         <button class="btn btn-outline btn-sm" id="cancel-emp" style="margin-left:8px">Отмена</button>
       </div>
     </div>
     <div class="table-wrap"><table>
-    <tr><th>ФИО</th><th>Должность</th><th>Тип расчёта</th><th>Фикс/день</th><th>Фикс/мес</th><th>%</th><th>Роль</th><th>Статус</th><th></th></tr>`;
+    <tr><th>ФИО</th><th>Должность</th><th>Тип расчёта</th><th>Фикс/день</th><th>Фикс/мес</th><th>%</th><th>Доступ</th><th>Статус</th><th></th></tr>`;
   for(const e of emps){
-    const roleCls=e.appRole&&e.appRole!=='none'?e.appRole:'none';
-    const roleText=e.appRole&&e.appRole!=='none'?roleLabel(e.appRole):'—';
+    const permCount = e.permissions ? Object.values(e.permissions).filter(v=>v).length : 0;
+    const permText = !e.permissions || permCount===0 ? '—' : (e.permissions.isOwner ? '⭐ Владелец' : permCount + ' прав');
+    const permColor = !e.permissions || permCount===0 ? 'var(--text2)' : (e.permissions.isOwner ? 'var(--accent)' : 'var(--green)');
     html+=`<tr><td>${e.name}</td><td>${e.position}</td><td>${e.calcType.replace(/_/g,' ')}</td>
       <td>${e.fixedDay||''}</td><td>${e.fixedMonth||''}</td><td>${e.percent||''}</td>
-      <td><span class="role-badge ${roleCls}">${roleText}</span></td>
+      <td><span style="color:${permColor};font-size:12px;font-weight:600">${permText}</span></td>
       <td><span style="color:${e.active?'var(--green)':'var(--red)'}">${e.active?'Активен':'Неактивен'}</span></td>
       <td class="row-btns">
         <button class="btn btn-outline btn-sm edit-emp" data-id="${e.id}">✏️</button>
@@ -1004,18 +1015,28 @@ function bindEmployees(){
     render();
   };
 
-  // Show/hide login/pass fields based on role
-  const roleSelect=document.getElementById('emp-app-role');
+  const searchInput=document.getElementById('emp-search');
+  if(searchInput)searchInput.oninput=()=>{empSearchQ=searchInput.value;render()};
+
+  // Show/hide login/pass/permissions based on canLogin checkbox
+  const canLogin=document.getElementById('emp-can-login');
   function toggleCredFields(){
-    const role=roleSelect?roleSelect.value:'none';
+    const show=canLogin&&canLogin.checked;
     const credFields=document.getElementById('emp-cred-fields');
     const passFields=document.getElementById('emp-pass-fields');
-    const show=role&&role!=='none';
+    const permsSection=document.getElementById('emp-perms-section');
     if(credFields)credFields.style.display=show?'':'none';
     if(passFields)passFields.style.display=show?'':'none';
+    if(permsSection)permsSection.style.display=show?'':'none';
   }
-  if(roleSelect)roleSelect.onchange=toggleCredFields;
+  if(canLogin)canLogin.onchange=toggleCredFields;
   toggleCredFields();
+
+  // Owner checkbox toggles all others
+  const ownerCheck=document.getElementById('perm-is-owner');
+  if(ownerCheck)ownerCheck.onchange=()=>{
+    document.querySelectorAll('.emp-perm').forEach(cb=>{if(cb.id!=='perm-is-owner')cb.checked=ownerCheck.checked});
+  };
 
   const posSel=document.getElementById('emp-position');
   if(posSel)posSel.onchange=()=>{
@@ -1037,11 +1058,12 @@ function bindEmployees(){
     }
     const name=document.getElementById('emp-fio').value.trim();
     if(!name){toast('Введите ФИО');return}
-    const appRole=document.getElementById('emp-app-role').value;
-    const login=appRole!=='none'?(document.getElementById('emp-login').value.trim()):'';
-    const pass=appRole!=='none'?(document.getElementById('emp-pass').value):'';
-    if(appRole!=='none'&&(!login||!pass)){toast('Укажите логин и пароль для роли с доступом');return}
-
+    const canLogin=document.getElementById('emp-can-login').checked;
+    const login=canLogin?(document.getElementById('emp-login').value.trim()):'';
+    const pass=canLogin?(document.getElementById('emp-pass').value):'';
+    if(canLogin&&(!login||!pass)){toast('Укажите логин и пароль');return}
+    const permissions={};
+    document.querySelectorAll('.emp-perm').forEach(cb=>{permissions[cb.dataset.perm]=cb.checked});
     const obj={
       name,
       position,
@@ -1050,9 +1072,10 @@ function bindEmployees(){
       fixedMonth:parseInt(document.getElementById('emp-fixed-month').value)||0,
       percent:parseInt(document.getElementById('emp-percent').value)||0,
       active:true,
-      appRole:appRole==='none'?undefined:appRole,
+      appRole:canLogin?'custom':'none',
       login:login||undefined,
-      pass:pass||undefined
+      pass:pass||undefined,
+      permissions:canLogin?permissions:undefined
     };
     const emps=getEmps();
     if(empEditId){
