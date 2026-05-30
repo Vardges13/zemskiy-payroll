@@ -3,863 +3,954 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Зарплата — Земский доктор-стоматолог</title>
+<title>Зарплаты — Земский доктор-стоматолог</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #0a1628; color: #e0e6f0; min-height: 100vh; }
-.header { background: linear-gradient(135deg, #081424, #17356a, #0c2248); padding: 20px; text-align: center; border-bottom: 2px solid #5ba3f5; }
-.header h1 { font-size: 24px; color: #fff; margin-bottom: 5px; }
-.header h1 span { color: #5ba3f5; }
-.header p { color: #8899aa; font-size: 14px; }
-.login-screen { max-width: 400px; margin: 60px auto; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 16px; border: 1px solid rgba(91,163,245,0.3); }
-.login-screen h2 { text-align: center; margin-bottom: 20px; color: #5ba3f5; }
-.login-screen input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #2a3a5a; background: #0a1628; color: #e0e6f0; font-size: 16px; }
-.login-screen button { width: 100%; padding: 14px; border: none; border-radius: 8px; background: #5ba3f5; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; }
-.login-screen button:hover { background: #4a8ae4; }
-.login-error { color: #ff6b6b; text-align: center; margin-top: 10px; font-size: 14px; }
-.app { display: none; }
-.tabs { display: flex; background: #0f1f3a; border-bottom: 2px solid #1a2a4a; overflow-x: auto; }
-.tab { padding: 14px 20px; cursor: pointer; color: #8899aa; font-size: 14px; white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.2s; }
-.tab:hover { color: #5ba3f5; }
-.tab.active { color: #5ba3f5; border-bottom-color: #5ba3f5; background: rgba(91,163,245,0.05); }
-.tab.owner-only { }
-.content { max-width: 1200px; margin: 0 auto; padding: 20px; }
-.panel { display: none; }
-.panel.active { display: block; }
-.section { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(91,163,245,0.1); }
-.section h3 { color: #5ba3f5; margin-bottom: 15px; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
-.row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
-.row label { min-width: 140px; font-size: 14px; color: #aabbcc; }
-.row input, .row select { padding: 10px 14px; border-radius: 8px; border: 1px solid #2a3a5a; background: #0a1628; color: #e0e6f0; font-size: 14px; }
-.row input:focus, .row select:focus { border-color: #5ba3f5; outline: none; }
-.btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; }
-.btn-primary { background: #5ba3f5; color: #fff; }
-.btn-primary:hover { background: #4a8ae4; }
-.btn-danger { background: #ff4757; color: #fff; }
-.btn-danger:hover { background: #e84141; }
-.btn-success { background: #7ec87e; color: #fff; }
-.btn-success:hover { background: #6ab86a; }
-.btn-outline { background: transparent; border: 1px solid #5ba3f5; color: #5ba3f5; }
-.btn-outline:hover { background: rgba(91,163,245,0.1); }
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th { background: rgba(91,163,245,0.1); color: #5ba3f5; padding: 12px; text-align: left; font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; position: sticky; top: 0; }
-td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-tr:hover { background: rgba(91,163,245,0.03); }
-.table-wrap { overflow-x: auto; max-height: 500px; overflow-y: auto; }
-.badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
-.badge-doctor { background: rgba(91,163,245,0.15); color: #5ba3f5; }
-.badge-admin { background: rgba(126,200,126,0.15); color: #7ec87e; }
-.badge-manager { background: rgba(240,192,64,0.15); color: #f0c040; }
-.badge-other { background: rgba(160,160,160,0.15); color: #aaa; }
-.total-box { background: rgba(91,163,245,0.1); border: 1px solid rgba(91,163,245,0.3); border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0; }
-.total-box .amount { font-size: 32px; font-weight: bold; color: #7ec87e; }
-.total-box .label { color: #8899aa; font-size: 14px; margin-bottom: 5px; }
-.month-nav { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-.month-nav button { background: rgba(91,163,245,0.1); border: 1px solid #5ba3f5; color: #5ba3f5; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 16px; }
-.month-nav span { font-size: 18px; font-weight: 600; }
-.day-inputs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-.day-inputs .field { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; }
-.day-inputs .field label { display: block; font-size: 11px; color: #8899aa; margin-bottom: 5px; text-transform: uppercase; }
-.day-inputs .field input { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #2a3a5a; background: #0a1628; color: #e0e6f0; font-size: 18px; font-weight: bold; }
-.summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
-.emp-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 15px; border: 1px solid rgba(91,163,245,0.1); }
-.emp-card .name { font-weight: 600; font-size: 16px; margin-bottom: 8px; }
-.emp-card .details { font-size: 13px; color: #8899aa; }
-.emp-card .salary { font-size: 24px; font-weight: bold; color: #7ec87e; margin-top: 10px; }
-.emp-card .salary-label { font-size: 12px; color: #8899aa; }
-.role-badge { position: fixed; top: 70px; right: 20px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; z-index: 100; }
-.role-badge.owner { background: rgba(240,192,64,0.2); color: #f0c040; border: 1px solid rgba(240,192,64,0.4); }
-.role-badge.manager { background: rgba(91,163,245,0.2); color: #5ba3f5; border: 1px solid rgba(91,163,245,0.4); }
-.logout-btn { position: fixed; top: 70px; left: 20px; padding: 6px 14px; border-radius: 20px; font-size: 12px; background: rgba(255,71,87,0.1); color: #ff4757; border: 1px solid rgba(255,71,87,0.3); cursor: pointer; z-index: 100; }
-select option { background: #0a1628; color: #e0e6f0; }
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
-.modal-overlay.active { display: flex; }
-.modal { background: #0f1f3a; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; border: 1px solid rgba(91,163,245,0.3); }
-.modal h3 { color: #5ba3f5; margin-bottom: 20px; }
-@media (max-width: 768px) {
-  .content { padding: 10px; }
-  .header h1 { font-size: 20px; }
-  .row { flex-direction: column; align-items: stretch; }
-  .row label { min-width: unset; }
-  .total-box .amount { font-size: 24px; }
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a1628;--card:#11203a;--border:#1e3455;--accent:#5ba3f5;--green:#7ec87e;--yellow:#f0c040;--red:#e05555;--text:#d0d8e8;--text2:#8899aa;--radius:8px}
+body{font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;width:100%;max-width:360px}
+.login-box h2{text-align:center;margin-bottom:20px;color:var(--accent)}
+.login-box input{width:100%;padding:10px 12px;margin:8px 0;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:14px}
+.login-box button{width:100%;padding:12px;margin-top:12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-size:15px;font-weight:600}
+.login-box button:hover{opacity:.85}
+.header{background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.header h1{font-size:16px;color:var(--accent)}
+.header .user-info{color:var(--text2);font-size:13px}
+.header button{background:none;border:1px solid var(--border);color:var(--text2);padding:6px 12px;border-radius:var(--radius);cursor:pointer;font-size:13px}
+.header button:hover{border-color:var(--accent);color:var(--accent)}
+.tabs{display:flex;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--border);padding:0 12px}
+.tabs button{padding:12px 16px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:13px;white-space:nowrap;border-bottom:2px solid transparent;transition:.2s}
+.tabs button:hover{color:var(--text)}
+.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+.content{padding:20px;max-width:1200px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.card h3{margin-bottom:12px;color:var(--accent);font-size:15px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:left}
+th{color:var(--text2);font-weight:600;background:rgba(255,255,255,.03)}
+tr:hover td{background:rgba(255,255,255,.02)}
+input[type=number],input[type=text],input[type=time],input[type=password],input[type=date],input[type=search],select,textarea{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 10px;font-size:13px;width:100%}
+input[type=number]{width:90px}
+input[type=time]{width:100px}
+select{cursor:pointer}
+textarea{resize:vertical;min-height:60px}
+.btn{padding:8px 16px;border:none;border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.85}
+.btn-success{background:var(--green);color:#000}
+.btn-danger{background:var(--red);color:#fff}
+.btn-warning{background:var(--yellow);color:#000}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.month-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.month-nav button{background:var(--card);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-size:14px}
+.month-nav button:hover{border-color:var(--accent);color:var(--accent)}
+.month-nav span{font-size:16px;font-weight:600;min-width:160px;text-align:center}
+.emp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.emp-card .emp-name{font-weight:600;font-size:15px;margin-bottom:4px}
+.emp-card .emp-pos{color:var(--text2);font-size:12px;margin-bottom:10px}
+.emp-card .emp-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;font-size:13px}
+.emp-card .emp-stats div{background:var(--bg);padding:8px;border-radius:var(--radius)}
+.emp-card .emp-stats .label{color:var(--text2);font-size:11px}
+.emp-card .emp-stats .val{font-weight:600;font-size:15px}
+.val-money{color:var(--green)}
+.val-total{color:var(--accent);font-size:17px!important}
+.fot-total{text-align:right;padding:16px;font-size:20px;font-weight:700;color:var(--accent)}
+.row-btns{display:flex;gap:4px;flex-wrap:wrap}
+table{overflow-x:auto}
+.table-wrap{overflow-x:auto;border-radius:var(--radius)}
+.settings-section{margin-bottom:24px}
+.settings-section h3{margin-bottom:12px;color:var(--accent)}
+.settings-row{display:flex;gap:10px;align-items:end;margin-bottom:10px;flex-wrap:wrap}
+.settings-row label{font-size:12px;color:var(--text2);min-width:100px}
+.settings-row input,.settings-row select{max-width:200px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--green);color:var(--green);padding:12px 20px;border-radius:var(--radius);font-size:14px;z-index:9999;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+.empty-msg{color:var(--text2);text-align:center;padding:30px;font-size:14px}
+@media(max-width:600px){
+.content{padding:12px}
+.card{padding:14px}
+.emp-card .emp-stats{grid-template-columns:1fr 1fr}
+.header h1{font-size:14px}
 }
+.hidden{display:none!important}
+.position-tag{display:inline-block;background:var(--bg);border:1px solid var(--border);padding:4px 10px;border-radius:var(--radius);margin:3px;font-size:13px}
+.position-tag .del-pos{cursor:pointer;color:var(--red);margin-left:6px}
 </style>
 </head>
 <body>
 
-<!-- Экран входа -->
-<div class="login-screen" id="loginScreen">
-  <h2>🏥 Вход в систему</h2>
-  <input type="text" id="loginUser" placeholder="Логин" autocomplete="username">
-  <input type="password" id="loginPass" placeholder="Пароль" autocomplete="current-password">
-  <button onclick="doLogin()">Войти</button>
-  <div class="login-error" id="loginError"></div>
-</div>
-
-<!-- Приложение -->
-<div class="app" id="appScreen">
-  <div class="header">
-    <h1>🏥 Зарплата — <span>Земский доктор</span></h1>
-    <p>Стоматологическая клиника</p>
-  </div>
-  <button class="logout-btn" onclick="doLogout()">🚪 Выйти</button>
-  <div class="role-badge" id="roleBadge"></div>
-
-  <div class="tabs">
-    <div class="tab active" onclick="showPanel('daily')">📅 Ввод за день</div>
-    <div class="tab" onclick="showPanel('monthly')">📊 Расчёт за месяц</div>
-    <div class="tab owner-only" onclick="showPanel('employees')">👥 Сотрудники</div>
-    <div class="tab owner-only" onclick="showPanel('history')">📜 История</div>
-    <div class="tab owner-only" onclick="showPanel('settings')">⚙️ Настройки</div>
-  </div>
-
-  <div class="content">
-    <!-- Ввод за день -->
-    <div class="panel active" id="panel-daily">
-      <div class="section">
-        <h3>📅 Выберите дату</h3>
-        <div class="row">
-          <label>Дата:</label>
-          <input type="date" id="dailyDate" onchange="loadDailyData()">
-        </div>
-      </div>
-      <div id="dailyEmployees"></div>
-      <div style="margin-top:20px">
-        <button class="btn btn-success" onclick="saveDailyData()">💾 Сохранить данные за день</button>
-      </div>
-    </div>
-
-    <!-- Расчёт за месяц -->
-    <div class="panel" id="panel-monthly">
-      <div class="section">
-        <div class="month-nav">
-          <button onclick="changeMonth(-1)">◀</button>
-          <span id="monthLabel"></span>
-          <button onclick="changeMonth(1)">▶</button>
-        </div>
-        <div class="total-box">
-          <div class="label">Общий ФОТ за месяц</div>
-          <div class="amount" id="totalFOT">0 ₽</div>
-        </div>
-        <div class="row" style="justify-content:flex-end">
-          <button class="btn btn-outline" onclick="exportExcel()">📥 Экспорт в Excel</button>
-        </div>
-      </div>
-      <div class="summary-grid" id="monthlySummary"></div>
-      <div class="section" style="margin-top:20px">
-        <h3>📋 Детальная таблица</h3>
-        <div class="table-wrap">
-          <table id="monthlyTable">
-            <thead><tr><th>Сотрудник</th><th>Должность</th><th>Дней/Смен</th><th>Выручка</th><th>Пациентов</th><th>Зарплата</th></tr></thead>
-            <tbody id="monthlyTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Сотрудники -->
-    <div class="panel" id="panel-employees">
-      <div class="section">
-        <h3>➕ Добавить сотрудника</h3>
-        <div class="row">
-          <label>ФИО:</label>
-          <input type="text" id="empName" placeholder="Иванов Иван Иванович">
-        </div>
-        <div class="row">
-          <label>Должность:</label>
-          <select id="empPosition">
-            <option value="doctor">Врач-стоматолог</option>
-            <option value="admin">Администратор</option>
-            <option value="manager">Управляющий</option>
-            <option value="nurse">Медсестра</option>
-            <option value="hygienist">Гигиенист</option>
-            <option value="other">Другое</option>
-          </select>
-        </div>
-        <div class="row">
-          <label>Тип расчёта:</label>
-          <select id="empCalcType" onchange="toggleCalcFields()">
-            <option value="fixed_day">Фикс за смену</option>
-            <option value="fixed_month">Фикс за месяц</option>
-            <option value="percent">% от выручки</option>
-            <option value="fixed_day_percent">Фикс/день + % от выручки</option>
-            <option value="fixed_month_percent">Фикс/мес + % от выручки</option>
-            <option value="fixed_day_percent_own">Фикс/день + % от своих пациентов</option>
-          </select>
-        </div>
-        <div class="row" id="rowFixedDay">
-          <label>Фикс за смену (₽):</label>
-          <input type="number" id="empFixedDay" placeholder="2000" value="0">
-        </div>
-        <div class="row" id="rowFixedMonth">
-          <label>Фикс за месяц (₽):</label>
-          <input type="number" id="empFixedMonth" placeholder="30000" value="0">
-        </div>
-        <div class="row" id="rowPercent">
-          <label>Процент (%):</label>
-          <input type="number" id="empPercent" placeholder="30" value="0" step="1" min="0" max="100">
-        </div>
-        <button class="btn btn-primary" onclick="addEmployee()">➕ Добавить</button>
-      </div>
-      <div class="section">
-        <h3>👥 Список сотрудников</h3>
-        <div class="table-wrap">
-          <table id="empTable">
-            <thead><tr><th>ФИО</th><th>Должность</th><th>Тип расчёта</th><th>Ставка</th><th>%</th><th></th></tr></thead>
-            <tbody id="empTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- История -->
-    <div class="panel" id="panel-history">
-      <div class="section">
-        <div class="month-nav">
-          <button onclick="changeHistMonth(-1)">◀</button>
-          <span id="histMonthLabel"></span>
-          <button onclick="changeHistMonth(1)">▶</button>
-        </div>
-        <h3>📜 История изменений</h3>
-        <div id="historyList" style="max-height:600px;overflow-y:auto"></div>
-      </div>
-    </div>
-
-    <!-- Настройки -->
-    <div class="panel" id="panel-settings">
-      <div class="section">
-        <h3>🔑 Управление доступом</h3>
-        <div class="row">
-          <label>Логин управляющей:</label>
-          <input type="text" id="mgrLogin" placeholder="manager">
-        </div>
-        <div class="row">
-          <label>Пароль управляющей:</label>
-          <input type="text" id="mgrPass" placeholder="Введите пароль">
-        </div>
-        <button class="btn btn-primary" onclick="saveManagerCreds()">💾 Сохранить</button>
-      </div>
-      <div class="section">
-        <h3>📁 Управление данными</h3>
-        <div class="row" style="gap:10px">
-          <button class="btn btn-outline" onclick="exportAllData()">📤 Экспорт всех данных</button>
-          <label class="btn btn-outline" style="display:inline-block">
-            📥 Импорт данных
-            <input type="file" accept=".json" style="display:none" onchange="importAllData(event)">
-          </label>
-          <button class="btn btn-danger" onclick="clearAllData()">🗑 Очистить все данные</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal" id="modalContent"></div>
-</div>
+<div id="app"></div>
+<div id="toast" class="toast"></div>
 
 <script>
-// ============ ДАННЫЕ ============
-const DEFAULT_EMPLOYEES = [
-  { id: 1, name: 'Мелоян Карен Наирович', position: 'doctor', calcType: 'percent', fixedDay: 0, fixedMonth: 0, percent: 30, active: true },
-  { id: 2, name: 'Баласанян Амаля Арамовна', position: 'doctor', calcType: 'percent', fixedDay: 0, fixedMonth: 0, percent: 25, active: true },
-  { id: 3, name: 'Кялоян Мгер Шаваршович', position: 'doctor', calcType: 'percent', fixedDay: 0, fixedMonth: 0, percent: 30, active: true },
-  { id: 4, name: 'Сидорейко Илья Михайлович', position: 'doctor', calcType: 'percent', fixedDay: 0, fixedMonth: 0, percent: 25, active: true },
-  { id: 5, name: 'Громов Ростислав Евгеньевич', position: 'doctor', calcType: 'percent', fixedDay: 0, fixedMonth: 0, percent: 30, active: true },
-  { id: 6, name: 'Меркулова Ангелина Олеговна', position: 'nurse', calcType: 'fixed_day_percent', fixedDay: 1200, fixedMonth: 0, percent: 5, active: true },
-  { id: 7, name: 'Соколова Елизавета Алексеевна', position: 'admin', calcType: 'fixed_day', fixedDay: 2000, fixedMonth: 0, percent: 0, active: true },
-  { id: 8, name: 'Алферова Татьяна Алексеевна', position: 'admin', calcType: 'fixed_day', fixedDay: 2000, fixedMonth: 0, percent: 0, active: true },
-  { id: 9, name: 'Белова Ирина Юрьевна', position: 'admin', calcType: 'fixed_day', fixedDay: 1500, fixedMonth: 0, percent: 0, active: true },
-  { id: 10, name: 'Азарко Оксана Владимировна', position: 'manager', calcType: 'fixed_month', fixedDay: 0, fixedMonth: 30000, percent: 0, active: true },
-  { id: 11, name: 'Киреева Ирина Алексеевна', position: 'admin', calcType: 'fixed_day', fixedDay: 2500, fixedMonth: 0, percent: 0, active: true },
-  { id: 12, name: 'Собиров Азим', position: 'other', calcType: 'fixed_day', fixedDay: 5000, fixedMonth: 0, percent: 0, active: true },
-  { id: 13, name: 'Максименко Надежда Петровна', position: 'other', calcType: 'fixed_month', fixedDay: 0, fixedMonth: 12000, percent: 0, active: true },
-  { id: 14, name: 'Москалева', position: 'other', calcType: 'fixed_month', fixedDay: 0, fixedMonth: 30000, percent: 0, active: true },
-  { id: 16, name: 'Титяева Оксана Дмитриевна', position: 'other', calcType: 'fixed_day', fixedDay: 500, fixedMonth: 0, percent: 0, active: true },
-  { id: 17, name: 'Скобелева Юлия Сергеевна', position: 'other', calcType: 'fixed_day', fixedDay: 500, fixedMonth: 0, percent: 0, active: true },
-  { id: 18, name: 'Линникова Виктория Михайловна', position: 'other', calcType: 'fixed_day', fixedDay: 500, fixedMonth: 0, percent: 0, active: true },
-  { id: 15, name: 'Ксюша', position: 'other', calcType: 'fixed_day', fixedDay: 0, fixedMonth: 0, percent: 0, active: false },
-];
-
-const POSITIONS = { doctor: 'Врач', admin: 'Администратор', manager: 'Управляющий', nurse: 'Медсестра', hygienist: 'Гигиенист', other: 'Другое' };
-const CALC_TYPES = {
-  fixed_day: 'Фикс/день',
-  fixed_month: 'Фикс/мес',
-  percent: '% от выручки',
-  fixed_day_percent: 'Фикс/день + %',
-  fixed_month_percent: 'Фикс/мес + %',
-  fixed_day_percent_own: 'Фикс/день + % свои пациенты'
+(function(){
+const LS={
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){localStorage.setItem(k,JSON.stringify(v))},
+  del(k){localStorage.removeItem(k)}
 };
 
-let currentUser = null;
-let currentMonth = new Date().getMonth();
-let currentYear = new Date().getFullYear();
-let histMonth = new Date().getMonth();
-let histYear = new Date().getFullYear();
-
-// ============ ХРАНИЛИЩЕ ============
-function getData(key, def) {
-  try { const v = localStorage.getItem('zp_' + key); return v ? JSON.parse(v) : def; }
-  catch { return def; }
-}
-function setData(key, val) { localStorage.setItem('zp_' + key, JSON.stringify(val)); }
-
-function getEmployees() {
-  return getData('employees', null) || [...DEFAULT_EMPLOYEES];
-}
-function setEmployees(emps) { setData('employees', emps); }
-
-function getDailyKey(date) { return 'daily_' + date; }
-function getDailyData(date) { return getData(getDailyKey(date), {}); }
-function setDailyData(date, data) { setData(getDailyKey(date), data); }
-
-function getCreds() { return getData('creds', { owner: { login: 'karen', pass: 'zemskiy2026' }, manager: { login: 'manager', pass: 'manager123' } }); }
-
-// ============ АВТОРИЗАЦИЯ ============
-function doLogin() {
-  const login = document.getElementById('loginUser').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  const creds = getCreds();
-  let role = null;
-  if (login === creds.owner.login && pass === creds.owner.pass) role = 'owner';
-  else if (login === creds.manager.login && pass === creds.manager.pass) role = 'manager';
-  
-  if (!role) {
-    document.getElementById('loginError').textContent = 'Неверный логин или пароль';
-    return;
+function initDefaults(){
+  if(!LS.get('zp_employees')){
+    const emps=[
+      {id:1,name:'Мелоян Карен Наирович',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:30,active:true},
+      {id:2,name:'Баласанян Амаля Арамовна',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:25,active:true},
+      {id:3,name:'Кялоян Мгер Шаваршович',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:30,active:true},
+      {id:4,name:'Сидорейко Илья Михайлович',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:25,active:true},
+      {id:5,name:'Громов Ростислав Евгеньевич',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:30,active:true},
+      {id:6,name:'Меркулова Ангелина Олеговна',position:'Медсестра',calcType:'fixed_day_percent',fixedDay:1200,fixedMonth:0,percent:5,active:true},
+      {id:7,name:'Соколова Елизавета Алексеевна',position:'Администратор',calcType:'fixed_day',fixedDay:2000,fixedMonth:0,percent:0,active:true},
+      {id:8,name:'Алферова Татьяна Алексеевна',position:'Администратор',calcType:'fixed_day',fixedDay:2000,fixedMonth:0,percent:0,active:true},
+      {id:9,name:'Белова Ирина Юрьевна',position:'Администратор',calcType:'fixed_day',fixedDay:1500,fixedMonth:0,percent:0,active:true},
+      {id:10,name:'Киреева Ирина Алексеевна',position:'Администратор',calcType:'fixed_day',fixedDay:2500,fixedMonth:0,percent:0,active:true},
+      {id:11,name:'Собиров Азим',position:'Ассистент',calcType:'fixed_day',fixedDay:5000,fixedMonth:0,percent:0,active:true},
+      {id:12,name:'Максименко Надежда Петровна',position:'Другое',calcType:'fixed_month',fixedDay:0,fixedMonth:12000,percent:0,active:true},
+      {id:13,name:'Москалева',position:'Другое',calcType:'fixed_month',fixedDay:0,fixedMonth:30000,percent:0,active:true},
+      {id:14,name:'Азарко Оксана Владимировна',position:'Управляющий',calcType:'fixed_month',fixedDay:0,fixedMonth:30000,percent:0,active:true},
+      {id:15,name:'Титяева Оксана Дмитриевна',position:'Ассистент',calcType:'fixed_day',fixedDay:500,fixedMonth:0,percent:0,active:true},
+      {id:16,name:'Скобелева Юлия Сергеевна',position:'Ассистент',calcType:'fixed_day',fixedDay:500,fixedMonth:0,percent:0,active:true},
+      {id:17,name:'Линникова Виктория Михайловна',position:'Администратор',calcType:'fixed_day',fixedDay:500,fixedMonth:0,percent:0,active:true}
+    ];
+    LS.set('zp_employees',emps);
   }
-  currentUser = { login, role };
-  setData('session', currentUser);
-  showApp();
+  if(!LS.get('zp_positions')){
+    LS.set('zp_positions',['Врач-стоматолог','Врач-хирург','Врач-терапевт','Ассистент','Администратор','Медсестра','Гигиенист','Управляющий','Другое']);
+  }
+  if(!LS.get('zp_creds')){
+    LS.set('zp_creds',{owner:{login:'karen',pass:'zemskiy2026'},manager:{login:'manager',pass:'manager123'},admin:{login:'admin',pass:'admin123'}});
+  }
+}
+initDefaults();
+
+let state={
+  role:null,
+  tab:'daily',
+  month:new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0'),
+  reportDate:todayStr()
+};
+
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+
+function empId(){const emps=LS.get('zp_employees',[]);return emps.length?Math.max(...emps.map(e=>e.id))+1:1}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-function doLogout() {
-  currentUser = null;
-  localStorage.removeItem('zp_session');
-  document.getElementById('appScreen').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'block';
-  document.getElementById('loginUser').value = '';
-  document.getElementById('loginPass').value = '';
-  document.getElementById('loginError').textContent = '';
+function addHistory(text){
+  const h=LS.get('zp_history',[]);
+  h.unshift({date:todayStr(),time:new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}),text,user:state.role||'system'});
+  if(h.length>200)h.length=200;
+  LS.set('zp_history',h);
 }
 
-function checkSession() {
-  const s = getData('session', null);
-  if (s) { currentUser = s; showApp(); }
+function getEmps(){return LS.get('zp_employees',[])}
+function getActiveEmps(){return getEmps().filter(e=>e.active)}
+function getPositions(){return LS.get('zp_positions',[])}
+
+function calcSalary(emp,worked,totalRevenue){
+  const ct=emp.calcType;
+  let salary=0;
+  if(ct==='fixed_day') salary=Math.round(emp.fixedDay*worked);
+  else if(ct==='fixed_month') salary=emp.fixedMonth;
+  else if(ct==='percent') salary=Math.round(totalRevenue*emp.percent/100);
+  else if(ct==='fixed_day_percent') salary=Math.round(emp.fixedDay*worked+totalRevenue*emp.percent/100);
+  else if(ct==='fixed_month_percent') salary=Math.round(emp.fixedMonth+totalRevenue*emp.percent/100);
+  else if(ct==='fixed_day_percent_own') salary=Math.round(emp.fixedDay*worked+(emp._ownRevenue||0)*emp.percent/100);
+  return salary;
 }
 
-function showApp() {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('appScreen').style.display = 'block';
-  
-  const badge = document.getElementById('roleBadge');
-  if (currentUser.role === 'owner') {
-    badge.className = 'role-badge owner';
-    badge.textContent = '👑 Владелец';
+function monthDays(ym){
+  const[y,m]=ym.split('-').map(Number);
+  const days=[];
+  const d=new Date(y,m-1,1);
+  while(d.getMonth()===m-1){days.push(fmtDate(d));d.setDate(d.getDate()+1)}
+  return days;
+}
+
+function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+
+function monthName(ym){
+  const months=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  return months[(parseInt(ym.split('-')[1]))-1]+' '+ym.split('-')[0];
+}
+
+function render(){
+  const app=document.getElementById('app');
+  const session=LS.get('zp_session',null);
+  if(!session||!session.role){
+    app.innerHTML=renderLogin();
+    bindLogin();
   } else {
-    badge.className = 'role-badge manager';
-    badge.textContent = '📋 Управляющая';
+    state.role=session.role;
+    app.innerHTML=renderApp();
+    bindApp();
   }
-  
-  // Скрыть вкладки для управляющей
-  document.querySelectorAll('.tab.owner-only').forEach(t => {
-    t.style.display = currentUser.role === 'owner' ? '' : 'none';
-  });
-  
-  // Установить текущую дату
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('dailyDate').value = today;
-  
-  showPanel('daily');
-  loadDailyData();
 }
 
-// ============ НАВИГАЦИЯ ============
-function showPanel(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('panel-' + name).classList.add('active');
-  
-  if (name === 'daily') loadDailyData();
-  else if (name === 'monthly') renderMonthly();
-  else if (name === 'employees') renderEmployees();
-  else if (name === 'history') renderHistory();
+function renderLogin(){
+  return `<div class="login-wrap"><div class="login-box">
+    <h2>🏥 Земский доктор</h2>
+    <input type="text" id="login-input" placeholder="Логин" autocomplete="username">
+    <input type="password" id="pass-input" placeholder="Пароль" autocomplete="current-password">
+    <button id="login-btn">Войти</button>
+  </div></div>`;
 }
 
-// ============ ВВОД ЗА ДЕНЬ ============
-function loadDailyData() {
-  const date = document.getElementById('dailyDate').value;
-  if (!date) return;
-  const emps = getEmployees().filter(e => e.active);
-  const data = getDailyData(date);
-  const container = document.getElementById('dailyEmployees');
-  
-  // Группировка по должностям
-  const groups = {};
-  emps.forEach(e => {
-    const pos = e.position || 'other';
-    if (!groups[pos]) groups[pos] = [];
-    groups[pos].push(e);
+function bindLogin(){
+  const btn=document.getElementById('login-btn');
+  const enter=()=>doLogin();
+  btn.onclick=enter;
+  document.getElementById('pass-input').onkeydown=e=>{if(e.key==='Enter')enter()};
+}
+
+function doLogin(){
+  const login=document.getElementById('login-input').value.trim();
+  const pass=document.getElementById('pass-input').value;
+  const creds=LS.get('zp_creds',{});
+  let role=null;
+  for(const[r,c] of Object.entries(creds)){
+    if(c.login===login&&c.pass===pass){role=r;break}
+  }
+  if(!role){toast('Неверный логин или пароль');return}
+  LS.set('zp_session',{login,role});
+  addHistory('Вход: '+login+' ('+role+')');
+  state.role=role;
+  if(role==='owner')state.tab='daily';
+  else if(role==='manager')state.tab='daily';
+  else state.tab='report';
+  render();
+}
+
+function logout(){
+  LS.del('zp_session');
+  state.role=null;
+  render();
+}
+
+function getTabs(){
+  const r=state.role;
+  if(r==='owner')return[
+    {id:'daily',icon:'📅',label:'Ввод за день'},
+    {id:'monthly',icon:'📊',label:'Расчёт за месяц'},
+    {id:'admin-report',icon:'📑',label:'Отчёт администратора'},
+    {id:'employees',icon:'👥',label:'Сотрудники'},
+    {id:'settings',icon:'⚙️',label:'Настройки'}
+  ];
+  if(r==='manager')return[
+    {id:'daily',icon:'📅',label:'Ввод за день'},
+    {id:'monthly',icon:'📊',label:'Расчёт за месяц'}
+  ];
+  return[{id:'report',icon:'📋',label:'Мой отчёт'}];
+}
+
+function renderApp(){
+  const tabs=getTabs();
+  if(!tabs.find(t=>t.id===state.tab))state.tab=tabs[0].id;
+  let tabsHtml=`<div class="header"><h1>🏥 Земский доктор-стоматолог</h1><div class="user-info">${state.role==='owner'?'Владелец':state.role==='manager'?'Управляющая':'Администратор'} (${LS.get('zp_session',{}).login||''})<button onclick="logout()">Выйти</button></div></div>`;
+  tabsHtml+=`<div class="tabs">`;
+  for(const t of tabs){
+    tabsHtml+=`<button class="${t.id===state.tab?'active':''}" data-tab="${t.id}">${t.icon} ${t.label}</button>`;
+  }
+  tabsHtml+=`</div><div class="content">`;
+  tabsHtml+=renderTab();
+  tabsHtml+=`</div>`;
+  return tabsHtml;
+}
+
+function renderTab(){
+  if(state.tab==='daily')return renderDaily();
+  if(state.tab==='monthly')return renderMonthly();
+  if(state.tab==='admin-report')return renderAdminReportView();
+  if(state.tab==='employees')return renderEmployees();
+  if(state.tab==='settings')return renderSettings();
+  if(state.tab==='report')return renderAdminForm();
+  return'';
+}
+
+function switchTab(tab){state.tab=tab;render()}
+
+function bindApp(){
+  document.querySelectorAll('.tabs button').forEach(b=>{
+    b.onclick=()=>switchTab(b.dataset.tab);
   });
-  
-  let html = '';
-  for (const [pos, group] of Object.entries(groups)) {
-    html += `<div class="section"><h3>${POSITIONS[pos] || pos}</h3>`;
-    group.forEach(emp => {
-      const d = data[emp.id] || { worked: 0, revenue: 0, patients: 0, ownRevenue: 0 };
-      const needsRevenue = ['percent','fixed_day_percent','fixed_month_percent','fixed_day_percent_own'].includes(emp.calcType);
-      const needsOwnRevenue = emp.calcType === 'fixed_day_percent_own';
-      
-      html += `<div style="background:rgba(255,255,255,0.02);padding:15px;border-radius:8px;margin-bottom:10px;border:1px solid rgba(91,163,245,0.05)">
-        <div style="font-weight:600;margin-bottom:10px">${emp.name} <span class="badge badge-${pos}">${POSITIONS[pos]}</span></div>
-        <div class="day-inputs">`;
-      
-      if (emp.calcType !== 'fixed_month') {
-        html += `<div class="field"><label>Отработал (дн./см.)</label><input type="number" id="d_${emp.id}_worked" value="${d.worked}" min="0" max="2" step="0.5"></div>`;
-      }
-      
-      if (emp.calcType === 'fixed_day_percent_own') {
-        html += `<div class="field"><label>Выручка за своих пациентов (₽)</label><input type="number" id="d_${emp.id}_ownRevenue" value="${d.ownRevenue || 0}" min="0"></div>`;
-      }
-      
-      if (needsRevenue && currentUser.role === 'owner') {
-        html += `<div class="field"><label>Общая выручка за день (₽)</label><input type="number" id="d_${emp.id}_revenue" value="${d.revenue}" min="0"></div>`;
-      }
-      
-      html += `<div class="field"><label>Пациентов</label><input type="number" id="d_${emp.id}_patients" value="${d.patients || 0}" min="0"></div>`;
-      html += `</div></div>`;
+  bindTabContent();
+}
+
+function bindTabContent(){
+  if(state.tab==='daily')bindDaily();
+  if(state.tab==='monthly')bindMonthly();
+  if(state.tab==='admin-report')bindAdminReportView();
+  if(state.tab==='employees')bindEmployees();
+  if(state.tab==='settings')bindSettings();
+  if(state.tab==='report')bindAdminForm();
+}
+
+// ========== DAILY INPUT ==========
+function renderDaily(){
+  const today=todayStr();
+  const emps=getActiveEmps();
+  const data=LS.get('zp_daily_'+today,{});
+  let html=`<div class="card"><h3>📅 Ввод данных за день</h3>
+    <div style="margin-bottom:16px"><label>Дата: </label><input type="date" id="daily-date" value="${today}"></div>
+    <div class="table-wrap"><table>
+    <tr><th>Сотрудник</th><th>Должность</th><th>Смен/дней</th>${state.role==='owner'?'<th>Выручка ₽</th>':''}<th>Пациентов</th></tr>`;
+  for(const e of emps){
+    if(e.calcType==='fixed_month')continue;
+    const d=data[e.id]||{};
+    html+=`<tr data-emp="${e.id}">
+      <td>${e.name}</td><td>${e.position}</td>
+      <td><input type="number" class="daily-worked" data-id="${e.id}" value="${d.worked||0}" min="0" step="0.5"></td>
+      ${state.role==='owner'?`<td><input type="number" class="daily-revenue" data-id="${e.id}" value="${d.revenue||0}" min="0"></td>`:''}
+      <td><input type="number" class="daily-patients" data-id="${e.id}" value="${d.patients||0}" min="0"></td>
+    </tr>`;
+  }
+  html+=`</table></div>
+    <button class="btn btn-success" id="save-daily" style="margin-top:16px">💾 Сохранить</button>
+  </div>`;
+  return html;
+}
+
+function bindDaily(){
+  const saveBtn=document.getElementById('save-daily');
+  if(saveBtn)saveBtn.onclick=()=>{
+    const date=document.getElementById('daily-date').value;
+    if(!date){toast('Выберите дату');return}
+    const data={};
+    document.querySelectorAll('tr[data-emp]').forEach(tr=>{
+      const id=parseInt(tr.dataset.emp);
+      const worked=parseFloat(tr.querySelector('.daily-worked')?.value)||0;
+      const rev=parseFloat(tr.querySelector('.daily-revenue')?.value)||0;
+      const pat=parseInt(tr.querySelector('.daily-patients')?.value)||0;
+      if(worked||rev||pat)data[id]={worked,revenue:rev,patients:pat};
     });
-    html += `</div>`;
-  }
-  
-  // Общая выручка за день (для владельца)
-  if (currentUser.role === 'owner') {
-    const dayData = data._day || { totalRevenue: 0 };
-    html += `<div class="section"><h3>💰 Общая выручка за день</h3>
-      <div class="row"><label>Выручка (₽):</label><input type="number" id="dayTotalRevenue" value="${dayData.totalRevenue}" min="0" style="font-size:20px;font-weight:bold"></div></div>`;
-  }
-  
-  container.innerHTML = html;
+    LS.set('zp_daily_'+date,data);
+    addHistory('Сохранён ввод за '+date);
+    toast('Сохранено за '+date);
+  };
 }
 
-function saveDailyData() {
-  const date = document.getElementById('dailyDate').value;
-  if (!date) return;
-  const emps = getEmployees().filter(e => e.active);
-  const data = getDailyData(date);
-  
-  emps.forEach(emp => {
-    const worked = document.getElementById('d_' + emp.id + '_worked');
-    const revenue = document.getElementById('d_' + emp.id + '_revenue');
-    const patients = document.getElementById('d_' + emp.id + '_patients');
-    const ownRevenue = document.getElementById('d_' + emp.id + '_ownRevenue');
-    
-    data[emp.id] = {
-      worked: worked ? parseFloat(worked.value) || 0 : 0,
-      revenue: revenue ? parseFloat(revenue.value) || 0 : 0,
-      patients: patients ? parseInt(patients.value) || 0 : 0,
-      ownRevenue: ownRevenue ? parseFloat(ownRevenue.value) || 0 : 0,
+// ========== MONTHLY ==========
+function renderMonthly(){
+  const days=monthDays(state.month);
+  const emps=getActiveEmps();
+  const advances=LS.get('zp_advances_'+state.month,{});
+  const isOwner=state.role==='owner';
+  let totalAll=0;
+  let totalRevAll=0;
+
+  let html=`<div class="month-nav">
+    <button id="prev-month">◀</button><span>${monthName(state.month)}</span><button id="next-month">▶</button>
+    <button class="btn btn-primary btn-sm" id="export-csv" style="margin-left:auto">📥 Экспорт CSV</button>
+  </div>`;
+
+  for(const emp of emps){
+    let totalWorked=0,totalPatients=0,totalOwnRevenue=0;
+    for(const day of days){
+      const d=LS.get('zp_daily_'+day,{})[emp.id]||{};
+      totalWorked+=d.worked||0;
+      totalPatients+=d.patients||0;
+      totalOwnRevenue+=d.revenue||0;
+    }
+    if(emp.calcType==='fixed_month'){totalWorked=0;totalOwnRevenue=0}
+    const salary=calcSalary({...emp,_ownRevenue:totalOwnRevenue},totalWorked,totalOwnRevenue);
+    const advance=advances[emp.id]||0;
+    const toPay=salary-advance;
+    totalAll+=toPay;
+    totalRevAll+=totalOwnRevenue;
+
+    html+=`<div class="emp-card">
+      <div class="emp-name">${emp.name}${emp.active?'':' (неактив)'}</div>
+      <div class="emp-pos">${emp.position} · ${emp.calcType.replace(/_/g,' ')}</div>
+      <div class="emp-stats">
+        <div><div class="label">Дней/смен</div><div class="val">${totalWorked}</div></div>
+        ${isOwner?`<div><div class="label">Выручка ₽</div><div class="val val-money">${totalOwnRevenue.toLocaleString('ru')}</div></div>`:''}
+        <div><div class="label">Пациентов</div><div class="val">${totalPatients}</div></div>
+        <div><div class="label">Начислено ₽</div><div class="val val-money">${salary.toLocaleString('ru')}</div></div>
+        ${isOwner?`<div><div class="label">Аванс ₽</div><div class="val"><input type="number" class="advance-input" data-id="${emp.id}" value="${advance}" min="0" style="width:90px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px"></div></div>`:`<div><div class="label">Аванс ₽</div><div class="val">${advance.toLocaleString('ru')}</div></div>`}
+        <div><div class="label">К выдаче ₽</div><div class="val val-total">${toPay.toLocaleString('ru')}</div></div>
+      </div>
+    </div>`;
+  }
+
+  if(isOwner){
+    html+=`<div class="fot-total">ФОТ: ${totalAll.toLocaleString('ru')} ₽ · Выручка: ${totalRevAll.toLocaleString('ru')} ₽</div>`;
+  } else {
+    html+=`<div class="fot-total">ФОТ: ${totalAll.toLocaleString('ru')} ₽</div>`;
+  }
+
+  return html;
+}
+
+function bindMonthly(){
+  const prev=document.getElementById('prev-month');
+  const next=document.getElementById('next-month');
+  const exp=document.getElementById('export-csv');
+  if(prev)prev.onclick=()=>{
+    const[y,m]=state.month.split('-').map(Number);
+    let nm=m-1,ny=y;if(nm<1){nm=12;ny--}
+    state.month=ny+'-'+String(nm).padStart(2,'0');
+    render();
+  };
+  if(next)next.onclick=()=>{
+    const[y,m]=state.month.split('-').map(Number);
+    let nm=m+1,ny=y;if(nm>12){nm=1;ny++}
+    state.month=ny+'-'+String(nm).padStart(2,'0');
+    render();
+  };
+  if(state.role==='owner'){
+    document.querySelectorAll('.advance-input').forEach(inp=>{
+      inp.onchange=()=>{
+        const advances=LS.get('zp_advances_'+state.month,{});
+        advances[inp.dataset.id]=parseFloat(inp.value)||0;
+        LS.set('zp_advances_'+state.month,advances);
+        render();
+      };
+    });
+  }
+  if(exp)exp.onclick=()=>exportCSV();
+}
+
+function exportCSV(){
+  const days=monthDays(state.month);
+  const emps=getActiveEmps();
+  const advances=LS.get('zp_advances_'+state.month,{});
+  let csv='\uFEFFСотрудник;Должность;Дней;Пациентов;Выручка;Начислено;Аванс;К выдаче\n';
+  for(const emp of emps){
+    let tw=0,tp=0,trv=0;
+    for(const day of days){const d=(LS.get('zp_daily_'+day,{})[emp.id]||{});tw+=d.worked||0;tp+=d.patients||0;trv+=d.revenue||0}
+    const sal=calcSalary({...emp,_ownRevenue:trv},tw,trv);
+    const adv=advances[emp.id]||0;
+    csv+=`${emp.name};${emp.position};${tw};${tp};${trv};${sal};${adv};${sal-adv}\n`;
+  }
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='payroll_'+state.month+'.csv';a.click();
+  toast('CSV экспортирован');
+}
+
+// ========== ADMIN REPORT VIEW (owner) ==========
+function renderAdminReportView(){
+  let html=`<div class="card"><h3>📑 Отчёт администратора</h3>
+    <div style="margin-bottom:16px"><label>Дата: </label><input type="date" id="admin-report-date" value="${state.reportDate}"></div>
+    <div id="admin-report-content"></div>
+  </div>`;
+  return html;
+}
+
+function bindAdminReportView(){
+  const dateInput=document.getElementById('admin-report-date');
+  const load=()=>{
+    state.reportDate=dateInput.value;
+    const data=LS.get('zp_report_'+state.reportDate,null);
+    const cont=document.getElementById('admin-report-content');
+    if(!data){cont.innerHTML='<div class="empty-msg">Нет отчёта за эту дату</div>';return}
+    cont.innerHTML=renderReportReadonly(data);
+  };
+  dateInput.onchange=load;
+  load();
+}
+
+function renderReportReadonly(data){
+  let html='<h4 style="margin-bottom:8px">Сотрудники на смене</h4><div class="table-wrap"><table><tr><th>ФИО</th><th>Должность</th><th>Начало</th><th>Конец</th><th>Часов</th><th>Опоздание</th><th>Примечание</th></tr>';
+  for(const s of(data.shifts||[])){
+    html+=`<tr><td>${s.name}</td><td>${s.position}</td><td>${s.start||''}</td><td>${s.end||''}</td><td>${s.hours||''}</td><td>${s.late||0}</td><td>${s.note||''}</td></tr>`;
+  }
+  html+='</table></div>';
+
+  html+='<h4 style="margin:16px 0 8px">Приём пациентов и оплата</h4><div class="table-wrap"><table><tr><th>Пациент</th><th>Врач</th><th>Услуга</th><th>Нал ₽</th><th>Безнал ₽</th><th>Способ</th><th>Итого</th></tr>';
+  let tNal=0,tBez=0;
+  for(const p of(data.patients||[])){
+    tNal+=p.cash||0;tBez+=p.cashless||0;
+    html+=`<tr><td>${p.patientName}</td><td>${p.doctor}</td><td>${p.service||''}</td><td>${(p.cash||0).toLocaleString('ru')}</td><td>${(p.cashless||0).toLocaleString('ru')}</td><td>${p.method||''}</td><td>${((p.cash||0)+(p.cashless||0)).toLocaleString('ru')}</td></tr>`;
+  }
+  html+=`<tr style="font-weight:700;color:var(--green)"><td colspan=3>ИТОГО</td><td>${tNal.toLocaleString('ru')}</td><td>${tBez.toLocaleString('ru')}</td><td></td><td>${(tNal+tBez).toLocaleString('ru')}</td></tr>`;
+  html+=`</table></div>`;
+
+  html+='<h4 style="margin:16px 0 8px">Расходы за день</h4><div class="table-wrap"><table><tr><th>Категория</th><th>Описание</th><th>Кому/Куда</th><th>Сумма ₽</th><th>Нал/Безнал</th><th>Документ</th><th>Примечание</th></tr>';
+  let tExp=0;
+  for(const e of(data.expenses||[])){
+    tExp+=e.amount||0;
+    html+=`<tr><td>${e.category}</td><td>${e.description||''}</td><td>${e.destination||''}</td><td>${(e.amount||0).toLocaleString('ru')}</td><td>${e.type||''}</td><td>${e.document||''}</td><td>${e.note||''}</td></tr>`;
+  }
+  html+=`<tr style="font-weight:700;color:var(--red)"><td colspan=3>ИТОГО РАСХОДЫ</td><td>${tExp.toLocaleString('ru')}</td><td colspan=3></td></tr>`;
+  html+='</table></div>';
+  return html;
+}
+
+// ========== ADMIN FORM ==========
+function renderAdminForm(){
+  const today=todayStr();
+  const data=LS.get('zp_report_'+today,{shifts:[],patients:[],expenses:[]});
+  const emps=getActiveEmps();
+  const doctors=emps.filter(e=>e.position.includes('Врач')||e.position.includes('Хирург')||e.position.includes('Терапевт'));
+
+  let html=`<div class="card"><h3>📋 Мой отчёт за ${today}</h3>
+    <h4 style="margin-bottom:8px">Сотрудники на смене</h4>
+    <div class="table-wrap"><table id="shifts-table">
+    <tr><th>ФИО</th><th>Должность</th><th>Начало</th><th>Конец</th><th>Часов</th><th>Опоздание</th><th>Примечание</th><th></th></tr>`;
+  for(const s of data.shifts){
+    html+=shiftRow(s,emps);
+  }
+  html+=`</table></div><button class="btn btn-outline btn-sm" id="add-shift" style="margin-top:8px">+ Добавить строку</button>`;
+
+  html+=`<h4 style="margin:20px 0 8px">Приём пациентов и оплата</h4>
+    <div class="table-wrap"><table id="patients-table">
+    <tr><th>Пациент</th><th>Врач</th><th>Услуга</th><th>Нал ₽</th><th>Безнал ₽</th><th>Способ</th><th>Итого</th><th></th></tr>`;
+  for(const p of data.patients){
+    html+=patientRow(p,doctors);
+  }
+  html+=`</table></div>
+    <div id="patients-totals" style="text-align:right;margin-top:8px;font-weight:600;color:var(--green)"></div>
+    <button class="btn btn-outline btn-sm" id="add-patient" style="margin-top:8px">+ Добавить пациента</button>`;
+
+  html+=`<h4 style="margin:20px 0 8px">Расходы за день</h4>
+    <div class="table-wrap"><table id="expenses-table">
+    <tr><th>Категория</th><th>Описание</th><th>Кому/Куда</th><th>Сумма ₽</th><th>Нал/Безнал</th><th>Документ</th><th>Примечание</th><th></th></tr>`;
+  for(const e of data.expenses){
+    html+=expenseRow(e);
+  }
+  html+=`</table></div>
+    <div id="expenses-total" style="text-align:right;margin-top:8px;font-weight:600;color:var(--red)"></div>
+    <button class="btn btn-outline btn-sm" id="add-expense" style="margin-top:8px">+ Добавить расход</button>`;
+
+  html+=`<div style="margin-top:24px"><button class="btn btn-success" id="save-report">💾 Сохранить отчёт</button></div></div>`;
+
+  return html;
+}
+
+function shiftRow(s,emps){
+  const opts=emps.map(e=>`<option value="${e.name}" ${e.name===s.name?'selected':''}>${e.name}</option>`).join('');
+  return `<tr class="shift-row"><td><select class="shift-name">${opts}<option value="">-- вручную --</option></select>
+    <input type="text" class="shift-name-manual" value="${s.name==='opts'?'':s.name}" style="display:none;margin-top:4px"></td>
+    <td><input type="text" class="shift-position" value="${s.position||''}"></td>
+    <td><input type="time" class="shift-start" value="${s.start||''}"></td>
+    <td><input type="time" class="shift-end" value="${s.end||''}"></td>
+    <td class="shift-hours">${s.hours||''}</td>
+    <td><input type="number" class="shift-late" value="${s.late||0}" min="0"></td>
+    <td><input type="text" class="shift-note" value="${s.note||''}"></td>
+    <td><button class="btn btn-danger btn-sm del-row">✕</button></td></tr>`;
+}
+
+function patientRow(p,doctors){
+  const opts=doctors.map(e=>`<option value="${e.name}" ${e.name===p.doctor?'selected':''}>${e.name}</option>`).join('');
+  return `<tr class="patient-row"><td><input type="text" class="pat-name" value="${p.patientName||''}"></td>
+    <td><select class="pat-doctor"><option value="">--</option>${opts}</select></td>
+    <td><input type="text" class="pat-service" value="${p.service||''}"></td>
+    <td><input type="number" class="pat-cash" value="${p.cash||0}" min="0"></td>
+    <td><input type="number" class="pat-cashless" value="${p.cashless||0}" min="0"></td>
+    <td><select class="pat-method"><option value="">—</option><option value="Сбер" ${p.method==='Сбер'?'selected':''}>Сбер</option><option value="ВТБ" ${p.method==='ВТБ'?'selected':''}>ВТБ</option><option value="Т-Банк" ${p.method==='Т-Банк'?'selected':''}>Т-Банк</option><option value="СБП QR" ${p.method==='СБП QR'?'selected':''}>СБП QR</option><option value="Другое" ${p.method==='Другое'?'selected':''}>Другое</option></select></td>
+    <td class="pat-total">${((p.cash||0)+(p.cashless||0)).toLocaleString('ru')}</td>
+    <td><button class="btn btn-danger btn-sm del-row">✕</button></td></tr>`;
+}
+
+function expenseRow(e){
+  return `<tr class="expense-row">
+    <td><select class="exp-category"><option value="Медикаменты" ${e.category==='Медикаменты'?'selected':''}>Медикаменты</option><option value="Расходные материалы" ${e.category==='Расходные материалы'?'selected':''}>Расходные материалы</option><option value="Ремонт" ${e.category==='Ремонт'?'selected':''}>Ремонт</option><option value="Хознужды" ${e.category==='Хознужды'?'selected':''}>Хознужды</option><option value="Зарплатные" ${e.category==='Зарплатные'?'selected':''}>Зарплатные</option><option value="Налоги" ${e.category==='Налоги'?'selected':''}>Налоги</option><option value="Другие" ${e.category==='Другие'?'selected':''}>Другие</option></select></td>
+    <td><input type="text" class="exp-desc" value="${e.description||''}"></td>
+    <td><input type="text" class="exp-dest" value="${e.destination||''}"></td>
+    <td><input type="number" class="exp-amount" value="${e.amount||0}" min="0"></td>
+    <td><select class="exp-type"><option value="Нал" ${e.type==='Нал'?'selected':''}>Нал</option><option value="Безнал" ${e.type==='Безнал'?'selected':''}>Безнал</option></select></td>
+    <td><input type="text" class="exp-doc" value="${e.document||''}"></td>
+    <td><input type="text" class="exp-note" value="${e.note||''}"></td>
+    <td><button class="btn btn-danger btn-sm del-row">✕</button></td></tr>`;
+}
+
+function bindAdminForm(){
+  const addShift=document.getElementById('add-shift');
+  const addPat=document.getElementById('add-patient');
+  const addExp=document.getElementById('add-expense');
+  const saveBtn=document.getElementById('save-report');
+
+  if(addShift)addShift.onclick=()=>{
+    const tbody=document.getElementById('shifts-table');
+    tbody.insertAdjacentHTML('beforeend',shiftRow({},getActiveEmps()));
+    bindShiftRowEvents(tbody.lastElementChild);
+  };
+  if(addPat)addPat.onclick=()=>{
+    const emps=getActiveEmps();
+    const doctors=emps.filter(e=>e.position.includes('Врач')||e.position.includes('Хирург')||e.position.includes('Терапевт'));
+    const tbody=document.getElementById('patients-table');
+    tbody.insertAdjacentHTML('beforeend',patientRow({},doctors));
+    bindPatientRowEvents(tbody.lastElementChild);
+  };
+  if(addExp)addExp.onclick=()=>{
+    const tbody=document.getElementById('expenses-table');
+    tbody.insertAdjacentHTML('beforeend',expenseRow({}));
+    bindExpenseRowEvents(tbody.lastElementChild);
+  };
+
+  document.querySelectorAll('.shift-row').forEach(bindShiftRowEvents);
+  document.querySelectorAll('.patient-row').forEach(bindPatientRowEvents);
+  document.querySelectorAll('.expense-row').forEach(bindExpenseRowEvents);
+  calcReportTotals();
+
+  if(saveBtn)saveBtn.onclick=()=>{
+    const today=todayStr();
+    const data={shifts:[],patients:[],expenses:[]};
+    document.querySelectorAll('.shift-row').forEach(tr=>{
+      const nameSel=tr.querySelector('.shift-name');
+      const nameMan=tr.querySelector('.shift-name-manual');
+      const name=nameSel.value==='-- вручную --'?(nameMan.value||''):nameSel.value;
+      data.shifts.push({
+        name,
+        position:tr.querySelector('.shift-position').value,
+        start:tr.querySelector('.shift-start').value,
+        end:tr.querySelector('.shift-end').value,
+        hours:tr.querySelector('.shift-hours').textContent,
+        late:parseInt(tr.querySelector('.shift-late').value)||0,
+        note:tr.querySelector('.shift-note').value
+      });
+    });
+    document.querySelectorAll('.patient-row').forEach(tr=>{
+      const cash=parseInt(tr.querySelector('.pat-cash').value)||0;
+      const cashless=parseInt(tr.querySelector('.pat-cashless').value)||0;
+      data.patients.push({
+        patientName:tr.querySelector('.pat-name').value,
+        doctor:tr.querySelector('.pat-doctor').value,
+        service:tr.querySelector('.pat-service').value,
+        cash,cashless,
+        method:tr.querySelector('.pat-method').value
+      });
+    });
+    document.querySelectorAll('.expense-row').forEach(tr=>{
+      data.expenses.push({
+        category:tr.querySelector('.exp-category').value,
+        description:tr.querySelector('.exp-desc').value,
+        destination:tr.querySelector('.exp-dest').value,
+        amount:parseInt(tr.querySelector('.exp-amount').value)||0,
+        type:tr.querySelector('.exp-type').value,
+        document:tr.querySelector('.exp-doc').value,
+        note:tr.querySelector('.exp-note').value
+      });
+    });
+    LS.set('zp_report_'+today,data);
+    addHistory('Сохранён отчёт администратора за '+today);
+    toast('Отчёт сохранён');
+  };
+}
+
+function bindShiftRowEvents(tr){
+  const nameSel=tr.querySelector('.shift-name');
+  const nameMan=tr.querySelector('.shift-name-manual');
+  if(nameSel){
+    nameSel.onchange=()=>{
+      nameMan.style.display=nameSel.value==='-- вручную --'?'block':'none';
+      if(nameSel.value!=='-- вручную --'){
+        const emp=getActiveEmps().find(e=>e.name===nameSel.value);
+        if(emp)tr.querySelector('.shift-position').value=emp.position;
+      }
+    };
+  }
+  const start=tr.querySelector('.shift-start');
+  const end=tr.querySelector('.shift-end');
+  const updHours=()=>{
+    if(start.value&&end.value){
+      const[sh,sm]=start.value.split(':').map(Number);
+      const[eh,em]=end.value.split(':').map(Number);
+      let h=(eh+em/60)-(sh+sm/60);
+      if(h<0)h+=24;
+      tr.querySelector('.shift-hours').textContent=h.toFixed(1);
+    }else{tr.querySelector('.shift-hours').textContent=''}
+  };
+  if(start)start.onchange=updHours;
+  if(end)end.onchange=updHours;
+  tr.querySelector('.del-row').onclick=()=>tr.remove();
+}
+
+function bindPatientRowEvents(tr){
+  const cashInp=tr.querySelector('.pat-cash');
+  const cashlessInp=tr.querySelector('.pat-cashless');
+  const upd=()=>{
+    const c=parseInt(cashInp.value)||0;
+    const b=parseInt(cashlessInp.value)||0;
+    tr.querySelector('.pat-total').textContent=(c+b).toLocaleString('ru');
+    calcReportTotals();
+  };
+  cashInp.oninput=upd;cashlessInp.oninput=upd;
+  tr.querySelector('.del-row').onclick=()=>{tr.remove();calcReportTotals()};
+}
+
+function bindExpenseRowEvents(tr){
+  const amtInp=tr.querySelector('.exp-amount');
+  amtInp.oninput=calcReportTotals;
+  tr.querySelector('.del-row').onclick=()=>{tr.remove();calcReportTotals()};
+}
+
+function calcReportTotals(){
+  let tCash=0,tBez=0;
+  document.querySelectorAll('.patient-row').forEach(tr=>{
+    tCash+=parseInt(tr.querySelector('.pat-cash').value)||0;
+    tBez+=parseInt(tr.querySelector('.pat-cashless').value)||0;
+  });
+  const pt=document.getElementById('patients-totals');
+  if(pt)pt.textContent=`Нал: ${tCash.toLocaleString('ru')} · Безнал: ${tBez.toLocaleString('ru')} · Всего: ${(tCash+tBez).toLocaleString('ru')} · Пациентов: ${document.querySelectorAll('.patient-row').length}`;
+
+  let tExp=0;
+  document.querySelectorAll('.expense-row').forEach(tr=>{
+    tExp+=parseInt(tr.querySelector('.exp-amount').value)||0;
+  });
+  const et=document.getElementById('expenses-total');
+  if(et)et.textContent=`Итого расходы: ${tExp.toLocaleString('ru')} ₽`;
+}
+
+// ========== EMPLOYEES ==========
+let empEditId=null;
+let showAddEmp=false;
+
+function renderEmployees(){
+  const emps=getEmps();
+  const positions=getPositions();
+  let html=`<div class="card"><h3>👥 Сотрудники (${emps.length})</h3>
+    <button class="btn btn-primary btn-sm" id="toggle-add-emp" style="margin-bottom:16px">+ Добавить сотрудника</button>
+    <div id="add-emp-form" class="${showAddEmp?'':'hidden'}" style="margin-bottom:20px">
+      <div class="card" style="background:var(--bg)">
+        <h4 id="emp-form-title">Новый сотрудник</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:12px">
+          <div><label style="font-size:12px;color:var(--text2)">ФИО</label><input type="text" id="emp-fio"></div>
+          <div><label style="font-size:12px;color:var(--text2)">Должность</label><select id="emp-position">${positions.map(p=>`<option value="${p}">${p}</option>`).join('')}<option value="__new__">+ Новая должность...</option></select><input type="text" id="emp-position-new" style="display:none;margin-top:4px" placeholder="Новая должность"></div>
+          <div><label style="font-size:12px;color:var(--text2)">Тип расчёта</label><select id="emp-calc">
+            <option value="fixed_day">Фикс за смену</option>
+            <option value="fixed_month">Фикс за месяц</option>
+            <option value="percent">Процент</option>
+            <option value="fixed_day_percent">Фикс/смен + %</option>
+            <option value="fixed_month_percent">Фикс/мес + %</option>
+            <option value="fixed_day_percent_own">Фикс/смен + % от своей выручки</option>
+          </select></div>
+          <div><label style="font-size:12px;color:var(--text2)">Фикс за смену ₽</label><input type="number" id="emp-fixed-day" value="0" min="0"></div>
+          <div><label style="font-size:12px;color:var(--text2)">Фикс за месяц ₽</label><input type="number" id="emp-fixed-month" value="0" min="0"></div>
+          <div><label style="font-size:12px;color:var(--text2)">Процент %</label><input type="number" id="emp-percent" value="0" min="0" max="100"></div>
+        </div>
+        <button class="btn btn-success btn-sm" id="save-emp">💾 Сохранить</button>
+        <button class="btn btn-outline btn-sm" id="cancel-emp" style="margin-left:8px">Отмена</button>
+      </div>
+    </div>
+    <div class="table-wrap"><table>
+    <tr><th>ФИО</th><th>Должность</th><th>Тип расчёта</th><th>Фикс/день</th><th>Фикс/мес</th><th>%</th><th>Статус</th><th></th></tr>`;
+  for(const e of emps){
+    html+=`<tr><td>${e.name}</td><td>${e.position}</td><td>${e.calcType.replace(/_/g,' ')}</td>
+      <td>${e.fixedDay||''}</td><td>${e.fixedMonth||''}</td><td>${e.percent||''}</td>
+      <td><span style="color:${e.active?'var(--green)':'var(--red)'}">${e.active?'Активен':'Неактивен'}</span></td>
+      <td class="row-btns">
+        <button class="btn btn-outline btn-sm edit-emp" data-id="${e.id}">✏️</button>
+        <button class="btn ${e.active?'btn-warning':'btn-success'} btn-sm toggle-emp" data-id="${e.id}">${e.active?'⏸':'▶'}</button>
+        <button class="btn btn-danger btn-sm del-emp" data-id="${e.id}">🗑</button>
+      </td></tr>`;
+  }
+  html+=`</table></div></div>`;
+
+  html+=`<div class="card"><h3>📌 Должности</h3>
+    <div style="margin-bottom:12px;display:flex;gap:8px">
+      <input type="text" id="new-position" placeholder="Новая должность" style="max-width:200px">
+      <button class="btn btn-primary btn-sm" id="add-position">+</button>
+    </div>
+    <div>`;
+  for(const p of positions){
+    const hasEmp=emps.some(e=>e.position===p);
+    html+=`<span class="position-tag">${p}${!hasEmp?` <span class="del-pos" data-pos="${p}" title="Удалить">✕</span>`:''}</span>`;
+  }
+  html+=`</div></div>`;
+
+  return html;
+}
+
+function bindEmployees(){
+  const toggleAdd=document.getElementById('toggle-add-emp');
+  if(toggleAdd)toggleAdd.onclick=()=>{
+    showAddEmp=!showAddEmp;
+    empEditId=null;
+    render();
+  };
+
+  const posSel=document.getElementById('emp-position');
+  if(posSel)posSel.onchange=()=>{
+    document.getElementById('emp-position-new').style.display=posSel.value==='__new__'?'block':'none';
+  };
+
+  const cancelBtn=document.getElementById('cancel-emp');
+  if(cancelBtn)cancelBtn.onclick=()=>{showAddEmp=false;empEditId=null;render()};
+
+  const saveBtn=document.getElementById('save-emp');
+  if(saveBtn)saveBtn.onclick=()=>{
+    const posSel=document.getElementById('emp-position');
+    let position=posSel.value;
+    if(position==='__new__'){
+      position=document.getElementById('emp-position-new').value.trim();
+      if(!position){toast('Введите название должности');return}
+      const ps=getPositions();
+      if(!ps.includes(position)){ps.push(position);LS.set('zp_positions',ps)}
+    }
+    const name=document.getElementById('emp-fio').value.trim();
+    if(!name){toast('Введите ФИО');return}
+    const obj={
+      name,
+      position,
+      calcType:document.getElementById('emp-calc').value,
+      fixedDay:parseInt(document.getElementById('emp-fixed-day').value)||0,
+      fixedMonth:parseInt(document.getElementById('emp-fixed-month').value)||0,
+      percent:parseInt(document.getElementById('emp-percent').value)||0,
+      active:true
+    };
+    const emps=getEmps();
+    if(empEditId){
+      const idx=emps.findIndex(e=>e.id===empEditId);
+      if(idx>=0){obj.id=empEditId;obj.active=emps[idx].active;emps[idx]=obj}
+      addHistory('Изменён сотрудник: '+name);
+    }else{
+      obj.id=empId();
+      emps.push(obj);
+      addHistory('Добавлен сотрудник: '+name);
+    }
+    LS.set('zp_employees',emps);
+    showAddEmp=false;empEditId=null;
+    render();toast('Сохранено');
+  };
+
+  document.querySelectorAll('.edit-emp').forEach(b=>{
+    b.onclick=()=>{
+      empEditId=parseInt(b.dataset.id);
+      const emp=getEmps().find(e=>e.id===empEditId);
+      if(!emp)return;
+      showAddEmp=true;render();
+      setTimeout(()=>{
+        document.getElementById('emp-fio').value=emp.name;
+        document.getElementById('emp-calc').value=emp.calcType;
+        document.getElementById('emp-fixed-day').value=emp.fixedDay;
+        document.getElementById('emp-fixed-month').value=emp.fixedMonth;
+        document.getElementById('emp-percent').value=emp.percent;
+        document.getElementById('emp-form-title').textContent='Редактирование: '+emp.name;
+      },50);
     };
   });
-  
-  // Общая выручка
-  const totalRev = document.getElementById('dayTotalRevenue');
-  if (totalRev) {
-    data._day = { totalRevenue: parseFloat(totalRev.value) || 0 };
-  }
-  
-  setDailyData(date, data);
-  addHistory(date, 'Сохранены данные за день');
-  alert('✅ Данные за ' + date + ' сохранены!');
-}
 
-// ============ РАСЧЁТ ЗАРПЛАТЫ ============
-function calcSalary(emp, dailyData) {
-  let salary = 0;
-  
-  switch (emp.calcType) {
-    case 'fixed_day':
-      salary = emp.fixedDay * dailyData.worked;
-      break;
-    case 'fixed_month':
-      salary = emp.fixedMonth;
-      break;
-    case 'percent':
-      salary = dailyData.revenue * emp.percent / 100;
-      break;
-    case 'fixed_day_percent':
-      salary = emp.fixedDay * dailyData.worked + dailyData.revenue * emp.percent / 100;
-      break;
-    case 'fixed_month_percent':
-      salary = emp.fixedMonth + dailyData.revenue * emp.percent / 100;
-      break;
-    case 'fixed_day_percent_own':
-      salary = emp.fixedDay * dailyData.worked + (dailyData.ownRevenue || 0) * emp.percent / 100;
-      break;
-  }
-  
-  return Math.round(salary);
-}
-
-function getDaysInMonth(year, month) {
-  return new Date(year, month + 1, 0).getDate();
-}
-
-function renderMonthly() {
-  const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-  document.getElementById('monthLabel').textContent = monthNames[currentMonth] + ' ' + currentYear;
-  
-  const emps = getEmployees().filter(e => e.active);
-  const days = getDaysInMonth(currentYear, currentMonth);
-  const totalFOTEl = document.getElementById('totalFOT');
-  let totalFOT = 0;
-  
-  let summaryHtml = '';
-  let tableHtml = '';
-  
-  emps.forEach(emp => {
-    let totalSalary = 0;
-    let totalDays = 0;
-    let totalRevenue = 0;
-    let totalPatients = 0;
-    
-    for (let d = 1; d <= days; d++) {
-      const date = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const data = getDailyData(date);
-      const dd = data[emp.id] || { worked: 0, revenue: 0, patients: 0, ownRevenue: 0 };
-      totalDays += dd.worked || 0;
-      totalRevenue += dd.revenue || 0;
-      totalPatients += dd.patients || 0;
-      totalSalary += calcSalary(emp, dd);
-    }
-    
-    totalFOT += totalSalary;
-    
-    const pos = emp.position || 'other';
-    const calcLabel = CALC_TYPES[emp.calcType] || emp.calcType;
-    const salaryStr = totalSalary.toLocaleString('ru-RU') + ' ₽';
-    
-    summaryHtml += `<div class="emp-card">
-      <div class="name">${emp.name}</div>
-      <div class="details">${POSITIONS[pos]} · ${calcLabel}</div>
-      <div class="details">Дней: ${totalDays} | Пациентов: ${totalPatients}</div>
-      ${currentUser.role === 'owner' ? `<div class="details" style="color:#5ba3f5">Выручка: ${totalRevenue.toLocaleString('ru-RU')} ₽</div>` : ''}
-      <div class="salary-label">К выдаче:</div>
-      <div class="salary">${salaryStr}</div>
-    </div>`;
-    
-    tableHtml += `<tr>
-      <td><strong>${emp.name}</strong></td>
-      <td>${POSITIONS[pos]}</td>
-      <td>${totalDays}</td>
-      ${currentUser.role === 'owner' ? `<td>${totalRevenue.toLocaleString('ru-RU')} ₽</td>` : ''}
-      <td>${totalPatients}</td>
-      <td><strong style="color:#7ec87e">${salaryStr}</strong></td>
-    </tr>`;
+  document.querySelectorAll('.toggle-emp').forEach(b=>{
+    b.onclick=()=>{
+      const id=parseInt(b.dataset.id);
+      const emps=getEmps();
+      const idx=emps.findIndex(e=>e.id===id);
+      if(idx>=0){emps[idx].active=!emps[idx].active;LS.set('zp_employees',emps);addHistory((emps[idx].active?'Активирован':'Деактивирован')+': '+emps[idx].name);render()}
+    };
   });
-  
-  totalFOTEl.textContent = totalFOT.toLocaleString('ru-RU') + ' ₽';
-  document.getElementById('monthlySummary').innerHTML = summaryHtml;
-  
-  // Обновить заголовок таблицы
-  const thead = document.querySelector('#monthlyTable thead tr');
-  if (currentUser.role === 'owner') {
-    thead.innerHTML = '<th>Сотрудник</th><th>Должность</th><th>Дней/Смен</th><th>Выручка</th><th>Пациентов</th><th>Зарплата</th>';
-  } else {
-    thead.innerHTML = '<th>Сотрудник</th><th>Должность</th><th>Дней/Смен</th><th>Пациентов</th><th>Зарплата</th>';
-  }
-  document.getElementById('monthlyTableBody').innerHTML = tableHtml;
-}
 
-function changeMonth(dir) {
-  currentMonth += dir;
-  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-  renderMonthly();
-}
-
-// ============ СОТРУДНИКИ ============
-function renderEmployees() {
-  const emps = getEmployees();
-  const body = document.getElementById('empTableBody');
-  
-  let html = '';
-  emps.forEach(emp => {
-    const pos = emp.position || 'other';
-    const calcLabel = CALC_TYPES[emp.calcType] || emp.calcType;
-    let rateStr = '';
-    if (emp.fixedDay) rateStr += emp.fixedDay + '₽/день ';
-    if (emp.fixedMonth) rateStr += emp.fixedMonth + '₽/мес ';
-    
-    html += `<tr style="${emp.active ? '' : 'opacity:0.4'}">
-      <td><strong>${emp.name}</strong></td>
-      <td><span class="badge badge-${pos}">${POSITIONS[pos]}</span></td>
-      <td>${calcLabel}</td>
-      <td>${rateStr || '—'}</td>
-      <td>${emp.percent ? emp.percent + '%' : '—'}</td>
-      <td>
-        <button class="btn btn-outline" style="padding:5px 10px;font-size:12px" onclick="editEmployee(${emp.id})">✏️</button>
-        <button class="btn btn-outline" style="padding:5px 10px;font-size:12px" onclick="toggleEmployee(${emp.id})">${emp.active ? '🔕' : '✅'}</button>
-        <button class="btn btn-danger" style="padding:5px 10px;font-size:12px" onclick="removeEmployee(${emp.id})">🗑</button>
-      </td>
-    </tr>`;
+  document.querySelectorAll('.del-emp').forEach(b=>{
+    b.onclick=()=>{
+      if(!confirm('Удалить сотрудника?'))return;
+      const id=parseInt(b.dataset.id);
+      let emps=getEmps();emps=emps.filter(e=>e.id!==id);LS.set('zp_employees',emps);addHistory('Удалён сотрудник id='+id);render();toast('Удалён');
+    };
   });
-  
-  body.innerHTML = html;
-}
 
-function toggleCalcFields() {
-  const type = document.getElementById('empCalcType').value;
-  document.getElementById('rowFixedDay').style.display = ['fixed_day','fixed_day_percent','fixed_day_percent_own'].includes(type) ? '' : 'none';
-  document.getElementById('rowFixedMonth').style.display = ['fixed_month','fixed_month_percent'].includes(type) ? '' : 'none';
-  document.getElementById('rowPercent').style.display = ['percent','fixed_day_percent','fixed_month_percent','fixed_day_percent_own'].includes(type) ? '' : 'none';
-}
-
-function addEmployee() {
-  const name = document.getElementById('empName').value.trim();
-  if (!name) { alert('Введите ФИО сотрудника'); return; }
-  
-  const emps = getEmployees();
-  const emp = {
-    id: Date.now(),
-    name,
-    position: document.getElementById('empPosition').value,
-    calcType: document.getElementById('empCalcType').value,
-    fixedDay: parseFloat(document.getElementById('empFixedDay').value) || 0,
-    fixedMonth: parseFloat(document.getElementById('empFixedMonth').value) || 0,
-    percent: parseFloat(document.getElementById('empPercent').value) || 0,
-    active: true,
+  const addPos=document.getElementById('add-position');
+  if(addPos)addPos.onclick=()=>{
+    const inp=document.getElementById('new-position');
+    const val=inp.value.trim();
+    if(!val)return;
+    const ps=getPositions();
+    if(ps.includes(val)){toast('Уже есть');return}
+    ps.push(val);LS.set('zp_positions',ps);addHistory('Добавлена должность: '+val);render();
   };
-  
-  emps.push(emp);
-  setEmployees(emps);
-  document.getElementById('empName').value = '';
-  renderEmployees();
-  addHistory(new Date().toISOString().split('T')[0], 'Добавлен сотрудник: ' + name);
-  alert('✅ Сотрудник ' + name + ' добавлен');
+
+  document.querySelectorAll('.del-pos').forEach(s=>{
+    s.onclick=()=>{
+      const pos=s.dataset.pos;
+      let ps=getPositions();ps=ps.filter(p=>p!==pos);LS.set('zp_positions',ps);addHistory('Удалена должность: '+pos);render();
+    };
+  });
 }
 
-function editEmployee(id) {
-  const emps = getEmployees();
-  const emp = emps.find(e => e.id === id);
-  if (!emp) return;
-  
-  const modal = document.getElementById('modalContent');
-  modal.innerHTML = `<h3>✏️ Редактировать: ${emp.name}</h3>
-    <div class="row"><label>ФИО:</label><input type="text" id="editName" value="${emp.name}"></div>
-    <div class="row"><label>Должность:</label><select id="editPosition">
-      ${Object.entries(POSITIONS).map(([k,v]) => `<option value="${k}" ${emp.position===k?'selected':''}>${v}</option>`).join('')}
-    </select></div>
-    <div class="row"><label>Тип расчёта:</label><select id="editCalcType">
-      ${Object.entries(CALC_TYPES).map(([k,v]) => `<option value="${k}" ${emp.calcType===k?'selected':''}>${v}</option>`).join('')}
-    </select></div>
-    <div class="row"><label>Фикс за смену:</label><input type="number" id="editFixedDay" value="${emp.fixedDay}"></div>
-    <div class="row"><label>Фикс за месяц:</label><input type="number" id="editFixedMonth" value="${emp.fixedMonth}"></div>
-    <div class="row"><label>Процент (%):</label><input type="number" id="editPercent" value="${emp.percent}" min="0" max="100"></div>
-    <div style="margin-top:20px;display:flex;gap:10px">
-      <button class="btn btn-success" onclick="saveEmployee(${id})">💾 Сохранить</button>
-      <button class="btn btn-outline" onclick="closeModal()">Отмена</button>
-    </div>`;
-  
-  document.getElementById('modalOverlay').classList.add('active');
-}
+// ========== SETTINGS ==========
+function renderSettings(){
+  const creds=LS.get('zp_creds',{});
+  let html=`<div class="card"><h3>⚙️ Настройки</h3>
 
-function saveEmployee(id) {
-  const emps = getEmployees();
-  const emp = emps.find(e => e.id === id);
-  if (!emp) return;
-  
-  emp.name = document.getElementById('editName').value.trim() || emp.name;
-  emp.position = document.getElementById('editPosition').value;
-  emp.calcType = document.getElementById('editCalcType').value;
-  emp.fixedDay = parseFloat(document.getElementById('editFixedDay').value) || 0;
-  emp.fixedMonth = parseFloat(document.getElementById('editFixedMonth').value) || 0;
-  emp.percent = parseFloat(document.getElementById('editPercent').value) || 0;
-  
-  setEmployees(emps);
-  closeModal();
-  renderEmployees();
-  addHistory(new Date().toISOString().split('T')[0], 'Изменён сотрудник: ' + emp.name);
-}
-
-function toggleEmployee(id) {
-  const emps = getEmployees();
-  const emp = emps.find(e => e.id === id);
-  if (emp) { emp.active = !emp.active; setEmployees(emps); renderEmployees(); }
-}
-
-function removeEmployee(id) {
-  if (!confirm('Удалить сотрудника?')) return;
-  let emps = getEmployees();
-  const emp = emps.find(e => e.id === id);
-  emps = emps.filter(e => e.id !== id);
-  setEmployees(emps);
-  renderEmployees();
-  if (emp) addHistory(new Date().toISOString().split('T')[0], 'Удалён сотрудник: ' + emp.name);
-}
-
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('active');
-}
-
-// ============ ИСТОРИЯ ============
-function addHistory(date, text) {
-  const hist = getData('history', []);
-  hist.unshift({ date, time: new Date().toLocaleTimeString('ru-RU'), text, user: currentUser ? currentUser.login : 'system' });
-  setData('history', hist);
-}
-
-function renderHistory() {
-  const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-  document.getElementById('histMonthLabel').textContent = monthNames[histMonth] + ' ' + histYear;
-  
-  const hist = getData('history', []);
-  const prefix = `${histYear}-${String(histMonth + 1).padStart(2, '0')}`;
-  const filtered = hist.filter(h => h.date.startsWith(prefix));
-  
-  const el = document.getElementById('historyList');
-  if (filtered.length === 0) {
-    el.innerHTML = '<p style="color:#8899aa;padding:20px">Нет записей за этот месяц</p>';
-    return;
-  }
-  
-  el.innerHTML = filtered.map(h => `<div style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.05)">
-    <div style="display:flex;justify-content:space-between">
-      <span style="color:#5ba3f5">${h.date}</span>
-      <span style="color:#8899aa">${h.time} · ${h.user}</span>
+    <div class="settings-section">
+      <h4>🔑 Пароль управляющей</h4>
+      <div class="settings-row"><label>Логин</label><input type="text" id="mgr-login" value="${creds.manager?.login||''}"></div>
+      <div class="settings-row"><label>Пароль</label><input type="text" id="mgr-pass" value="${creds.manager?.pass||''}"></div>
+      <button class="btn btn-primary btn-sm" id="save-mgr">Сохранить</button>
     </div>
-    <div style="margin-top:5px">${h.text}</div>
-  </div>`).join('');
+
+    <div class="settings-section">
+      <h4>🔑 Пароль администратора</h4>
+      <div class="settings-row"><label>Логин</label><input type="text" id="adm-login" value="${creds.admin?.login||''}"></div>
+      <div class="settings-row"><label>Пароль</label><input type="text" id="adm-pass" value="${creds.admin?.pass||''}"></div>
+      <button class="btn btn-primary btn-sm" id="save-adm">Сохранить</button>
+    </div>
+
+    <div class="settings-section">
+      <h4>💾 Данные</h4>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-success btn-sm" id="export-json">📥 Экспорт JSON</button>
+        <button class="btn btn-primary btn-sm" id="import-json">📤 Импорт JSON</button>
+        <button class="btn btn-danger btn-sm" id="clear-data">🗑 Очистить все данные</button>
+      </div>
+      <input type="file" id="import-file" accept=".json" style="display:none">
+    </div>
+  </div>`;
+  return html;
 }
 
-function changeHistMonth(dir) {
-  histMonth += dir;
-  if (histMonth > 11) { histMonth = 0; histYear++; }
-  if (histMonth < 0) { histMonth = 11; histYear--; }
-  renderHistory();
-}
-
-// ============ НАСТРОЙКИ ============
-function saveManagerCreds() {
-  const creds = getCreds();
-  const login = document.getElementById('mgrLogin').value.trim();
-  const pass = document.getElementById('mgrPass').value;
-  if (!login || !pass) { alert('Заполните оба поля'); return; }
-  creds.manager.login = login;
-  creds.manager.pass = pass;
-  setData('creds', creds);
-  alert('✅ Доступ управляющей обновлён');
-}
-
-// ============ ЭКСПОРТ ============
-function exportExcel() {
-  const emps = getEmployees().filter(e => e.active);
-  const days = getDaysInMonth(currentYear, currentMonth);
-  const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июнь','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-  
-  let csv = '\uFEFF'; // BOM for UTF-8
-  csv += 'Зарплатная ведомость — ' + monthNames[currentMonth] + ' ' + currentYear + '\n\n';
-  csv += 'Сотрудник;Должность;Дней/Смен;Выручка;Пациентов;Зарплата\n';
-  
-  emps.forEach(emp => {
-    let totalDays = 0, totalRevenue = 0, totalPatients = 0, totalSalary = 0;
-    for (let d = 1; d <= days; d++) {
-      const date = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const data = getDailyData(date);
-      const dd = data[emp.id] || { worked: 0, revenue: 0, patients: 0, ownRevenue: 0 };
-      totalDays += dd.worked;
-      totalRevenue += dd.revenue;
-      totalPatients += dd.patients;
-      totalSalary += calcSalary(emp, dd);
-    }
-    csv += `${emp.name};${POSITIONS[emp.position]};${totalDays};${totalRevenue};${totalPatients};${totalSalary}\n`;
-  });
-  
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `zarplata_${currentYear}_${currentMonth + 1}.csv`;
-  link.click();
-}
-
-function exportAllData() {
-  const allData = {
-    employees: getEmployees(),
-    creds: getCreds(),
-    exportDate: new Date().toISOString(),
+function bindSettings(){
+  const saveMgr=document.getElementById('save-mgr');
+  if(saveMgr)saveMgr.onclick=()=>{
+    const creds=LS.get('zp_creds',{});
+    creds.manager={login:document.getElementById('mgr-login').value.trim(),pass:document.getElementById('mgr-pass').value};
+    LS.set('zp_creds',creds);toast('Сохранено');addHistory('Изменён пароль управляющей');
   };
-  
-  // Добавить все дневные данные
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key.startsWith('zp_daily_')) {
-      allData[key] = JSON.parse(localStorage.getItem(key));
-    }
-    if (key === 'zp_history') {
-      allData.history = JSON.parse(localStorage.getItem(key));
-    }
-  }
-  
-  const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `payroll_backup_${new Date().toISOString().split('T')[0]}.json`;
-  link.click();
-  addHistory(new Date().toISOString().split('T')[0], 'Экспорт всех данных');
-}
-
-function importAllData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (data.employees) setEmployees(data.employees);
-      if (data.creds) setData('creds', data.creds);
-      Object.keys(data).forEach(key => {
-        if (key.startsWith('zp_daily_') || key === 'zp_history') {
-          localStorage.setItem(key, JSON.stringify(data[key]));
-        }
-      });
-      alert('✅ Данные импортированы!');
-      addHistory(new Date().toISOString().split('T')[0], 'Импорт данных из файла');
-      location.reload();
-    } catch (err) {
-      alert('❌ Ошибка импорта: ' + err.message);
-    }
+  const saveAdm=document.getElementById('save-adm');
+  if(saveAdm)saveAdm.onclick=()=>{
+    const creds=LS.get('zp_creds',{});
+    creds.admin={login:document.getElementById('adm-login').value.trim(),pass:document.getElementById('adm-pass').value};
+    LS.set('zp_creds',creds);toast('Сохранено');addHistory('Изменён пароль администратора');
   };
-  reader.readAsText(file);
+  const expBtn=document.getElementById('export-json');
+  if(expBtn)expBtn.onclick=()=>{
+    const allKeys=['zp_employees','zp_positions','zp_creds','zp_history'];
+    const data={};
+    // Collect daily data
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k.startsWith('zp_'))data[k]=LS.get(k);
+    }
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='payroll_backup_'+todayStr()+'.json';a.click();
+    toast('Экспорт выполнен');
+  };
+  const impBtn=document.getElementById('import-json');
+  const impFile=document.getElementById('import-file');
+  if(impBtn)impBtn.onclick=()=>impFile.click();
+  if(impFile)impFile.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      try{
+        const data=JSON.parse(ev.target.result);
+        for(const[k,v] of Object.entries(data)){LS.set(k,v)}
+        toast('Импорт выполнен');addHistory('Импорт данных');render();
+      }catch(e){toast('Ошибка: неверный JSON')}
+    };
+    reader.readAsText(file);
+  };
+  const clearBtn=document.getElementById('clear-data');
+  if(clearBtn)clearBtn.onclick=()=>{
+    if(!confirm('Удалить ВСЕ данные? Это необратимо!'))return;
+    const keys=[];
+    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith('zp_'))keys.push(k)}
+    keys.forEach(k=>localStorage.removeItem(k));
+    initDefaults();
+    toast('Все данные очищены');render();
+  };
 }
 
-function clearAllData() {
-  if (!confirm('Удалить ВСЕ данные? Это необратимо!')) return;
-  if (!confirm('Вы уверены? Все сотрудники, зарплаты, история — всё будет удалено.')) return;
-  const keys = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key.startsWith('zp_')) keys.push(key);
-  }
-  keys.forEach(k => localStorage.removeItem(k));
-  location.reload();
-}
+// Make logout global
+window.logout=logout;
 
-// ============ ИНИЦИАЛИЗАЦИЯ ============
-document.addEventListener('DOMContentLoaded', () => {
-  toggleCalcFields();
-  checkSession();
-  
-  // Enter для входа
-  document.getElementById('loginPass').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') doLogin();
-  });
-});
-
-// Закрытие модала кликом вне
-document.getElementById('modalOverlay').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('modalOverlay')) closeModal();
-});
+render();
+})();
 </script>
 </body>
 </html>
