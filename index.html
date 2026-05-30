@@ -423,7 +423,7 @@ function renderTab(){
   return'';
 }
 
-function switchTab(tab){state.tab=tab;render()}
+function switchTab(tab){state.tab=tab;empEditId=null;showAddEmp=false;empSearchQ='';render()}
 
 function bindApp(){
   document.querySelectorAll('.tabs button').forEach(b=>{
