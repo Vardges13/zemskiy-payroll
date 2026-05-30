@@ -129,15 +129,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
 .schedule-table .day-name{font-size:10px;color:var(--text2)}
 .schedule-table .shift-cell{cursor:pointer;transition:background .15s;position:relative}
 .schedule-table .shift-cell:hover{background:rgba(45,212,191,0.12)}
-.schedule-table .shift-cell.working{background:rgba(52,211,153,0.2)}
-.schedule-table .shift-cell.half1{background:rgba(251,191,36,0.15)}
-.schedule-table .shift-cell.half2{background:rgba(45,212,191,0.2)}
-.schedule-table .shift-cell.weekend{background:rgba(248,113,113,0.06)}
-.schedule-table .shift-cell.working.weekend{background:rgba(52,211,153,0.15)}
-.schedule-table .shift-cell .shift-label{font-size:10px;font-weight:500}
-.schedule-table .shift-cell .shift-label.full-label{color:var(--green)}
-.schedule-table .shift-cell .shift-label.half1-label{color:var(--yellow)}
-.schedule-table .shift-cell .shift-label.half2-label{color:var(--accent)}
+.schedule-table .shift-cell.working{background:rgba(52,211,153,0.2)}.schedule-table .shift-cell.vacation{background:rgba(45,212,191,0.12);color:var(--accent)}.schedule-table .shift-cell.practice{background:rgba(168,85,247,0.15);color:#c084fc}.schedule-table .shift-cell.weekend{background:rgba(248,113,113,0.06)}.schedule-table .shift-cell.weekend.off{background:rgba(248,113,113,0.18);color:var(--red)}.schedule-table .shift-cell .shift-label{font-size:11px;font-weight:600}.schedule-table .shift-cell .shift-label.s-work{color:var(--green)}.schedule-table .shift-cell .shift-label.s-vacation{color:var(--accent)}.schedule-table .shift-cell .shift-label.s-off{color:var(--red)}.schedule-table .shift-cell .shift-label.s-practice{color:#c084fc}.schedule-table .day-header.today-col{outline:2px solid var(--accent);outline-offset:-2px;border-radius:2px}
+.schedule-table .shift-cell.today-cell{outline:2px solid var(--accent);outline-offset:-2px;border-radius:2px}
 .schedule-controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
 
 /* Role badge */
@@ -573,30 +566,31 @@ function renderSchedule(){
     const isToday=fmtDate(dateObj)===today;
     let cls='day-header';
     if(isWeekend)cls+=' weekend';
-    if(isToday)cls+=' today';
+    if(isToday)cls+=' today-col';
     html+=`<th class="${cls}"><div class="day-num">${d}</div><div class="day-name">${dayNames[mappedDow]}</div></th>`;
   }
   html+=`</tr></thead><tbody>`;
 
+  const statusCycle=['Р','О','В','П'];
+  const statusLabels={Р:'Рабочий',О:'Отпуск',В:'Выходной',П:'Практика'};
+  const statusCls={Р:'working',О:'vacation',В:'off',П:'practice'};
+  const statusLblCls={Р:'s-work',О:'s-vacation',В:'s-off',П:'s-practice'};
   for(const emp of emps){
     const empSch=schedule[emp.id]||{};
-    const doc=isDoctor(emp);
-    html+=`<tr><td class="name-col">${emp.name}${doc?' 👨‍⚕️':''}</td>`;
+    html+=`<tr><td class="name-col">${emp.name}</td>`;
     for(let d=1;d<=daysInMonth;d++){
       const dateObj=new Date(y,m-1,d);
       const dow=dateObj.getDay();
       const isWeekend=dow===0||dow===6;
-      const val=empSch[d]||'';
+      const isToday=fmtDate(dateObj)===today;
+      // Default: Р for weekdays, В for weekends
+      const val=empSch[d]||(isWeekend?'В':'Р');
       let cls='shift-cell';
-      if(val==='full')cls+=' working';
-      else if(val==='half1')cls+=' half1';
-      else if(val==='half2')cls+=' half2';
+      cls+=' '+statusCls[val];
       if(isWeekend)cls+=' weekend';
-      let label='';
-      if(val==='full')label='<span class="shift-label full-label">●</span>';
-      else if(val==='half1')label='<span class="shift-label half1-label">½</span>';
-      else if(val==='half2')label='<span class="shift-label half2-label">½</span>';
-      html+=`<td class="${cls}" data-emp="${emp.id}" data-day="${d}" title="${emp.name} — день ${d}">${label}</td>`;
+      if(isToday)cls+=' today-cell';
+      const label=`<span class="shift-label ${statusLblCls[val]}">${val}</span>`;
+      html+=`<td class="${cls}" data-emp="${emp.id}" data-day="${d}" data-val="${val}" title="${emp.name} — ${d}: ${statusLabels[val]}">${label}</td>`;
     }
     html+=`</tr>`;
   }
@@ -623,32 +617,24 @@ function bindSchedule(){
     render();
   };
 
-  // Click cells to toggle shift type
+  const statusCycle=['Р','О','В','П'];
+  // Click cells to cycle status
   document.querySelectorAll('.shift-cell').forEach(cell=>{
     cell.onclick=()=>{
       const empId=parseInt(cell.dataset.emp);
       const day=parseInt(cell.dataset.day);
-      const emp=getEmps().find(e=>e.id===empId);
-      const doc=emp&&isDoctor(emp);
-
       const scheduleKey='zp_schedule_'+state.month.replace('-','_');
       const schedule=LS.get(scheduleKey,{});
       if(!schedule[empId])schedule[empId]={};
-      const cur=schedule[empId][day]||'';
-
-      if(doc){
-        // Doctor: cycle through none → full → half1 → half2 → none
-        const cycle=['','full','half1','half2'];
-        const idx=cycle.indexOf(cur);
-        const next=(idx+1)%cycle.length;
-        if(next===0)delete schedule[empId][day];
-        else schedule[empId][day]=cycle[next];
-      } else {
-        // Non-doctor: toggle working/not
-        if(cur){delete schedule[empId][day]}
-        else{schedule[empId][day]='full'}
-      }
-
+      const cur=cell.dataset.val||'Р';
+      const idx=statusCycle.indexOf(cur);
+      const next=statusCycle[(idx+1)%statusCycle.length];
+ // Only save if different from default
+      const dateObj=new Date(parseInt(state.month.split('-')[0]),parseInt(state.month.split('-')[1])-1,day);
+      const isWeekend=dateObj.getDay()===0||dateObj.getDay()===6;
+      const defaultVal=isWeekend?'В':'Р';
+      if(next===defaultVal)delete schedule[empId][day];
+      else schedule[empId][day]=next;
       LS.set(scheduleKey,schedule);
       render();
     };
