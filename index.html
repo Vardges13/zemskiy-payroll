@@ -154,6 +154,25 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
   .header h1{font-size:14px}
   .schedule-table th,.schedule-table td{min-width:30px;padding:3px 4px}
 }
+/* LIGHT THEME */
+body.light{--bg:linear-gradient(135deg,#f0f4f8 0%,#e2e8f0 100%);--bg-solid:#f8fafc;--card:rgba(255,255,255,0.9);--card-solid:#ffffff;--border:rgba(0,0,0,0.08);--text:#1e293b;--text2:#64748b;--input-bg:#ffffff}
+body.light .header{background:rgba(255,255,255,0.8);border-bottom-color:rgba(0,0,0,0.06)}
+body.light .login-box{background:rgba(255,255,255,0.9);border-color:rgba(0,0,0,0.08);box-shadow:0 8px 32px rgba(0,0,0,0.1)}
+body.light .login-box input{background:#f8fafc;border-color:#cbd5e1;color:#1e293b}
+body.light .emp-card{background:#fff;border-color:#e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+body.light table{border-color:#e2e8f0}
+body.light th{background:#f1f5f9;color:#64748b}
+body.light td{border-color:#e2e8f0}
+body.light .fot-total{background:rgba(56,189,248,0.08);color:#1e293b}
+body.light .schedule-table th{background:#f1f5f9;color:#64748b}
+body.light .position-tag{background:#f1f5f9;color:#475569}
+body.light .role-badge.owner{background:rgba(56,189,248,0.15);color:#0284c7}
+body.light .role-badge.manager{background:rgba(74,222,128,0.15);color:#166534}
+body.light .role-badge.admin{background:rgba(251,191,36,0.15);color:#92400e}
+body.light .role-badge.none{background:#f1f5f9;color:#94a3b8}
+body.light .settings-section{border-color:#e2e8f0}
+body.light .toast{background:#1e293b;color:#fff}
+
 </style>
 </head>
 <body>
@@ -349,6 +368,7 @@ function getTabs(){
   if(r==='owner')return[
     {id:'daily',icon:'📅',label:'Ввод за день'},
     {id:'monthly',icon:'📊',label:'Расчёт за месяц'},
+    {id:'month-report',icon:'📋',label:'Отчёт за месяц'},
     {id:'schedule',icon:'🗓',label:'График'},
     {id:'admin-report',icon:'📑',label:'Отчёт администратора'},
     {id:'employees',icon:'👥',label:'Сотрудники'},
@@ -365,7 +385,9 @@ function getTabs(){
 function renderApp(){
   const tabs=getTabs();
   if(!tabs.find(t=>t.id===state.tab))state.tab=tabs[0].id;
-  let html=`<div class="header"><h1>🦷 Земский доктор-стоматолог</h1><div class="user-info">${roleLabel(state.role)} (${LS.get('zp_session',{}).login||''})<button onclick="logout()">Выйти</button></div></div>`;
+  let html=`<div class="header"><h1>🦷 Земский доктор-стоматолог</h1><div class="user-info">${roleLabel(state.role)} (${LS.get('zp_session',{}).login||''})
+    <button id="theme-toggle" title="Сменить тему" style="font-size:16px;padding:6px 10px">${LS.get('zp_theme','dark')==='light'?'☀️':'🌙'}</button>
+    <button onclick="logout()">Выйти</button></div></div>`;
   html+=`<div class="tabs">`;
   for(const t of tabs){
     html+=`<button class="${t.id===state.tab?'active':''}" data-tab="${t.id}">${t.icon} ${t.label}</button>`;
@@ -377,6 +399,7 @@ function renderApp(){
 function renderTab(){
   if(state.tab==='daily')return renderDaily();
   if(state.tab==='monthly')return renderMonthly();
+  if(state.tab==='month-report')return renderMonthReport();
   if(state.tab==='schedule')return renderSchedule();
   if(state.tab==='admin-report')return renderAdminReportView();
   if(state.tab==='employees')return renderEmployees();
@@ -391,12 +414,24 @@ function bindApp(){
   document.querySelectorAll('.tabs button').forEach(b=>{
     b.onclick=()=>switchTab(b.dataset.tab);
   });
+  // Theme toggle
+  const themeBtn=document.getElementById('theme-toggle');
+  if(themeBtn)themeBtn.onclick=()=>{
+    const cur=LS.get('zp_theme','dark');
+    const next=cur==='dark'?'light':'dark';
+    LS.set('zp_theme',next);
+    document.body.classList.toggle('light',next==='light');
+    themeBtn.textContent=next==='light'?'☀️':'🌙';
+  };
+  // Apply saved theme on load
+  if(LS.get('zp_theme','dark')==='light')document.body.classList.add('light');
   bindTabContent();
 }
 
 function bindTabContent(){
   if(state.tab==='daily')bindDaily();
   if(state.tab==='monthly')bindMonthly();
+  if(state.tab==='month-report')bindMonthReport();
   if(state.tab==='schedule')bindSchedule();
   if(state.tab==='admin-report')bindAdminReportView();
   if(state.tab==='employees')bindEmployees();
@@ -545,6 +580,123 @@ function exportCSV(){
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='payroll_'+state.month+'.csv';a.click();
   toast('CSV экспортирован');
+}
+
+// ========== MONTH REPORT ==========
+function renderMonthReport(){
+  const days=monthDays(state.month);
+  const emps=getActiveEmps();
+  const advances=LS.get('zp_advances_'+state.month,{});
+
+  let totalRevenue=0,totalExpenses=0,totalFOT=0,totalPatients=0;
+  let revenueByDay={};
+  let doctorsRevenue={};
+
+  for(const day of days){
+    let dayRev=0,dayExp=0,dayPat=0;
+    const daily=LS.get('zp_daily_'+day,{});
+    const report=LS.get('zp_report_'+day,null);
+    for(const e of emps){
+      const d=daily[e.id]||{};
+      dayRev+=d.revenue||0;
+      dayPat+=d.patients||0;
+      if(e.position.includes('Врач')){
+        doctorsRevenue[e.name]=(doctorsRevenue[e.name]||0)+(d.revenue||0);
+      }
+    }
+    if(report){
+      for(const p of(report.patients||[])){dayRev+=p.cash||0;dayPat++}
+      for(const e of(report.expenses||[])){dayExp+=e.amount||0}
+    }
+    revenueByDay[day]=dayRev;
+    totalRevenue+=dayRev;
+    totalExpenses+=dayExp;
+    totalPatients+=dayPat;
+  }
+
+  for(const emp of emps){
+    let tw=0,trv=0;
+    for(const day of days){const d=(LS.get('zp_daily_'+day,{})[emp.id]||{});tw+=d.worked||0;trv+=d.revenue||0}
+    const sal=calcSalary({...emp,_ownRevenue:trv},tw,trv);
+    const adv=advances[emp.id]||0;
+    totalFOT+=sal;
+  }
+
+  const margin=totalRevenue-totalFOT-totalExpenses;
+  const avgCheck=totalPatients>0?Math.round(totalRevenue/totalPatients):0;
+  const workDays=Object.values(revenueByDay).filter(v=>v>0).length;
+  const avgDayRev=workDays>0?Math.round(totalRevenue/workDays):0;
+  const topDay=Object.entries(revenueByDay).sort((a,b)=>b[1]-a[1])[0];
+  const lowDays=Object.entries(revenueByDay).filter(([d,v])=>v>0&&v<avgDayRev*0.5);
+
+  // Top doctors
+  const sortedDocs=Object.entries(doctorsRevenue).sort((a,b)=>b[1]-a[1]);
+
+  let html=`<div class="card"><h3>📋 Отчёт за ${monthName(state.month)}</h3>
+    <div class="month-nav">
+      <button id="mr-prev-month">◀</button><span>${monthName(state.month)}</span><button id="mr-next-month">▶</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:16px">
+      <div style="background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.2);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px">Общая выручка</div>
+        <div style="font-size:22px;font-weight:700;color:var(--accent);margin-top:4px">${totalRevenue.toLocaleString('ru')} ₽</div>
+      </div>
+      <div style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px">Расходы</div>
+        <div style="font-size:22px;font-weight:700;color:var(--red);margin-top:4px">${totalExpenses.toLocaleString('ru')} ₽</div>
+      </div>
+      <div style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.2);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px">ФОТ</div>
+        <div style="font-size:22px;font-weight:700;color:var(--green);margin-top:4px">${totalFOT.toLocaleString('ru')} ₽</div>
+      </div>
+      <div style="background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.2);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px">Маржа</div>
+        <div style="font-size:22px;font-weight:700;color:${margin>=0?'var(--green)':'var(--red)'};margin-top:4px">${margin.toLocaleString('ru')} ₽</div>
+      </div>
+      <div style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px">Средний чек</div>
+        <div style="font-size:22px;font-weight:700;color:var(--yellow);margin-top:4px">${avgCheck.toLocaleString('ru')} ₽</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px">Пациентов</div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);margin-top:4px">${totalPatients}</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px">Рабочих дней</div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);margin-top:4px">${workDays}</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px">Ср. выручка/день</div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);margin-top:4px">${avgDayRev.toLocaleString('ru')} ₽</div>
+      </div>
+    </div>
+    ${topDay?`<div style="margin-top:14px;padding:10px 14px;background:rgba(74,222,128,0.08);border-radius:var(--radius-sm);font-size:13px">🏆 <b>Лучший день:</b> ${topDay[0]} — <b style="color:var(--green)">${topDay[1].toLocaleString('ru')} ₽</b></div>`:''}
+    ${lowDays.length?`<div style="margin-top:8px;padding:10px 14px;background:rgba(248,113,113,0.08);border-radius:var(--radius-sm);font-size:13px">⚠️ <b>Ниже среднего (менее 50% от нормы):</b> ${lowDays.map(([d])=>d).join(', ')}</div>`:''}`;
+
+  if(sortedDocs.length){
+    html+=`<div style="margin-top:16px"><h4 style="margin-bottom:10px">👨‍⚕️ Выручка по врачам</h4><div style="display:grid;gap:6px">`;
+    for(const[name,rev] of sortedDocs){
+      const pct=totalRevenue>0?Math.round(rev/totalRevenue*100):0;
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm)"><span>${name}</span><span style="font-weight:600;color:var(--accent)">${rev.toLocaleString('ru')} ₽ <span style="color:var(--text2);font-size:12px">(${pct}%)</span></span></div>`;
+    }
+    html+=`</div></div>`;
+  }
+
+  html+=`</div>`;
+  return html;
+}
+
+function bindMonthReport(){
+  const prev=document.getElementById('mr-prev-month');
+  const next=document.getElementById('mr-next-month');
+  if(prev)prev.onclick=()=>{
+    const[y,m]=state.month.split('-').map(Number);let nm=m-1,ny=y;if(nm<1){nm=12;ny--}
+    state.month=ny+'-'+String(nm).padStart(2,'0');render();
+  };
+  if(next)next.onclick=()=>{
+    const[y,m]=state.month.split('-').map(Number);let nm=m+1,ny=y;if(nm>12){nm=1;ny++}
+    state.month=ny+'-'+String(nm).padStart(2,'0');render();
+  };
 }
 
 // ========== SCHEDULE CALENDAR ==========
