@@ -169,6 +169,23 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
   .header{padding:8px 12px}
   .schedule-table th,.schedule-table td{min-width:30px;padding:3px 4px}
 }
+/* Cloud sync indicator */
+.cloud-icon{font-size:18px;cursor:pointer;position:relative;transition:opacity .3s;user-select:none;line-height:1}
+.cloud-icon.green{filter:none}.cloud-icon.yellow{animation:cloud-pulse 2s infinite}@keyframes cloud-pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.cloud-icon.red{opacity:.7}
+.cloud-menu{position:absolute;top:100%;right:0;background:var(--bg-light);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px;z-index:9999;min-width:180px;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.cloud-menu.show{display:block}
+.cloud-menu-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--text);transition:background .15s;white-space:nowrap}
+.cloud-menu-item:hover{background:var(--hover)}
+.cloud-menu-item .cmi-status{font-size:11px;color:var(--text-muted);margin-left:auto}
+.cloud-status-bar{font-size:11px;color:var(--text-muted);padding:4px 8px;border-top:1px solid var(--border);margin-top:4px}
+.cloud-config{background:var(--bg-lighter);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.cloud-config h4{color:var(--accent);font-size:14px;margin-bottom:12px}
+.cloud-config .cc-row{display:flex;gap:10px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.cloud-config .cc-row label{font-size:12px;color:var(--text-dim);min-width:120px}
+.cloud-config .cc-row input{max-width:400px}
+.cloud-config .cc-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.cloud-syncing{color:var(--yellow)!important;pointer-events:none}
 /* LIGHT THEME */
 body.light{--bg:#e6ebf0;--bg-light:#ffffff;--bg-lighter:#f0f2f5;--input-bg:#ffffff;--input-border:#d1d9e0;--bubble-out:#ffffff;--bubble-in:#eff2f5;--border:rgba(0,0,0,0.06);--text:#222;--text-dim:#708499;--text-muted:#a0aec0;--hover:rgba(0,0,0,0.04)}
 body.light .header{background:#ffffff;border-bottom-color:rgba(0,0,0,0.08)}
@@ -202,6 +219,282 @@ const LS={
   set(k,v){localStorage.setItem(k,JSON.stringify(v))},
   del(k){localStorage.removeItem(k)}
 };
+
+// ==================== ОБЛАЧНОЕ ХРАНИЛИЩЕ ====================
+const Cloud={
+  config:{
+    url:LS.get('zp_cloud_url',''),
+    key:LS.get('zp_cloud_key','')
+  },
+  connected:false,
+  lastSync:null,
+  syncing:false,
+  errorCount:0,
+  _cache:{}, // Кэш данных из облака
+  _syncTimer:null,
+
+  // Проверить подключение
+  async ping(){
+    if(!this.config.url)return{ok:false,error:'URL не настроен'};
+    try{
+      const r=await fetch(this.config.url+'?action=ping',{signal:AbortSignal.timeout(8000)});
+      const j=await r.json();
+      if(j.status==='ok'){this.connected=true;this.errorCount=0;return{ok:true,data:j.data}}
+      return{ok:false,error:j.message||'Ошибка ответа'};
+    }catch(e){
+      this.connected=false;this.errorCount++;
+      return{ok:false,error:'Не удалось подключиться'};
+    }
+  },
+
+  // Инициализация
+  async init(){
+    this.config.url=LS.get('zp_cloud_url','');
+    this.config.key=LS.get('zp_cloud_key','');
+    if(!this.config.url)return;
+    const p=await this.ping();
+    if(p.ok)this._startAutoSync();
+    this._updateIcon();
+  },
+
+  // Загрузить данные из облака
+  async load(type,params){
+    if(!this.config.url)return null;
+    try{
+      let url=this.config.url+'?action='+type+'&key='+encodeURIComponent(this.config.key);
+      if(params){for(const[k,v] of Object.entries(params))url+='&'+k+'='+encodeURIComponent(v)}
+      const r=await fetch(url,{signal:AbortSignal.timeout(15000)});
+      const j=await r.json();
+      if(j.status==='ok')return j.data;
+      toast('☁️ Ошибка загрузки: '+j.message);return null;
+    }catch(e){toast('☁️ Ошибка сети при загрузке');return null}
+  },
+
+  // Сохранить данные в облако
+  async save(type,data,replace){
+    if(!this.config.url)return false;
+    try{
+      const body={data,replace:!!replace};
+      const r=await fetch(this.config.url+'?action='+type+'&key='+encodeURIComponent(this.config.key),{
+        method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify(body),signal:AbortSignal.timeout(30000)
+      });
+      const j=await r.json();
+      if(j.status==='ok')return true;
+      toast('☁️ Ошибка сохранения: '+j.message);return false;
+    }catch(e){toast('☁️ Ошибка сети при сохранении');return false}
+  },
+
+  // Полная синхронизация: загрузить всё из облака → записать в localStorage
+  async sync(){
+    if(this.syncing)return;
+    this.syncing=true;
+    this._updateIcon();
+    try{
+      const data=await this.load('read_all');
+      if(!data)return false;
+
+      // Сотрудники
+      if(data.employees){LS.set('zp_employees',data.employees)}
+
+      // Данные за день: конвертируем из строкового формата в zp_daily_DATE
+      if(data.daily){
+        const byDate={};
+        data.daily.forEach(r=>{
+          if(!byDate[r.date])byDate[r.date]={};
+          byDate[r.date][r.emp_id]={worked:r.worked||0,revenue:r.revenue||0,patients:r.patients||0};
+        });
+        Object.entries(byDate).forEach(([d,v])=>LS.set('zp_daily_'+d,v));
+      }
+
+      // Авансы: конвертируем из строкового формата в zp_advances_MONTH
+      if(data.advances){
+        const byMonth={};
+        data.advances.forEach(r=>{
+          if(!byMonth[r.month])byMonth[r.month]={};
+          byMonth[r.month][r.emp_id]=r.amount||0;
+        });
+        Object.entries(byMonth).forEach(([m,v])=>LS.set('zp_advances_'+m,v));
+      }
+
+      // График: конвертируем из строкового формата в zp_schedule_MONTH
+      if(data.schedule){
+        const byMonth={};
+        data.schedule.forEach(r=>{
+          // r.date в формате YYYY-MM-DD → month = YYYY_MM
+          const parts=r.date.split('-');
+          const mKey=parts[0]+'_'+parts[1];
+          if(!byMonth[mKey])byMonth[mKey]={};
+          if(!byMonth[mKey][r.emp_id])byMonth[mKey][r.emp_id]={};
+          const day=parseInt(parts[2]);
+          byMonth[mKey][r.emp_id][day]=r.status;
+        });
+        Object.entries(byMonth).forEach(([m,v])=>LS.set('zp_schedule_'+m,v));
+      }
+
+      // Настройки (если есть zp_creds и т.д.)
+      if(data.settings){
+        // zp_settings пока не используем активно, но сохраняем на будущее
+      }
+
+      this.connected=true;
+      this.lastSync=new Date().toISOString();
+      this.errorCount=0;
+      this._syncQueue=[]; // Очищаем очередь
+      toast('☁️ Синхронизация завершена');
+      return true;
+    }catch(e){
+      this.connected=false;this.errorCount++;
+      toast('☁️ Ошибка синхронизации');
+      return false;
+    }finally{
+      this.syncing=false;
+      this._updateIcon();
+    }
+  },
+
+  // Выгрузить ВСЕ локальные данные в облако
+  async pushAll(){
+    if(this.syncing)return;
+    this.syncing=true;
+    this._updateIcon();
+    try{
+      // Собираем всех сотрудников
+      const employees=LS.get('zp_employees',[]);
+
+      // Собираем все данные за день из localStorage
+      const daily=[];
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k.startsWith('zp_daily_')){
+          const date=k.replace('zp_daily_','');
+          const d=LS.get(k,{});
+          Object.entries(d).forEach(([eid,v])=>{
+            daily.push({date,emp_id:parseInt(eid),worked:v.worked||0,revenue:v.revenue||0,patients:v.patients||0});
+          });
+        }
+      }
+
+      // Собираем все авансы
+      const advances=[];
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k.startsWith('zp_advances_')){
+          const month=k.replace('zp_advances_','');
+          const a=LS.get(k,{});
+          Object.entries(a).forEach(([eid,v])=>{
+            advances.push({emp_id:parseInt(eid),month,amount:v||0});
+          });
+        }
+      }
+
+      // Собираем график
+      const schedule=[];
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k.startsWith('zp_schedule_')){
+          const parts=k.replace('zp_schedule_','').split('_');
+          const month=parts[0]+'-'+parts[1];
+          const sch=LS.get(k,{});
+          Object.entries(sch).forEach(([eid,days])=>{
+            Object.entries(days).forEach(([day,status])=>{
+              schedule.push({emp_id:parseInt(eid),date:month+'-'+String(day).padStart(2,'0'),status});
+            });
+          });
+        }
+      }
+
+      const result=await this.save('bulk_write',{employees,daily,advances,schedule},true);
+      if(result){
+        this.connected=true;
+        this.lastSync=new Date().toISOString();
+        this._syncQueue=[];
+        toast('☁️ Данные выгружены в облако');
+      }
+      return result;
+    }catch(e){
+      toast('☁️ Ошибка выгрузки');return false;
+    }finally{
+      this.syncing=false;
+      this._updateIcon();
+    }
+  },
+
+  // Очередь изменений для синхронизации
+  _syncQueue:[],
+
+  // Поставить ключ в очередь на синхронизацию
+  queueSync(key){
+    if(!this.config.url)return;
+    if(!this._syncQueue.includes(key))this._syncQueue.push(key);
+    this._updateIcon();
+  },
+
+  // Автосинхронизация каждые 15 секунд
+  _startAutoSync(){
+    if(this._syncTimer)clearInterval(this._syncTimer);
+    this._syncTimer=setInterval(async()=>{
+      if(!navigator.onLine||this.syncing)return;
+      if(this._syncQueue.length===0)return;
+      await this.pushAll();
+    },15000);
+  },
+
+  // Обновить значок синхронизации
+  _updateIcon(){
+    const icon=document.getElementById('cloud-icon');
+    if(!icon)return;
+    icon.className='cloud-icon';
+    if(this.syncing){
+      icon.classList.add('yellow');
+      icon.textContent='⏳';
+    }else if(!this.config.url){
+      icon.classList.add('');
+      icon.textContent='☁️';
+    }else if(this._syncQueue.length>0){
+      icon.classList.add('yellow');
+      icon.textContent='☁️';
+    }else if(this.connected){
+      icon.classList.add('green');
+      icon.textContent='☁️';
+    }else{
+      icon.classList.add('red');
+      icon.textContent='☁️';
+    }
+  },
+
+  // Настроить облако
+  configure(url,key){
+    this.config.url=url.trim().replace(/\/$/,'');
+    this.config.key=key.trim();
+    LS.set('zp_cloud_url',this.config.url);
+    LS.set('zp_cloud_key',this.config.key);
+    if(this.config.url){
+      this.ping().then(p=>{
+        this._updateIcon();
+        if(p.ok)this._startAutoSync();
+      });
+    }else{
+      this.connected=false;
+      if(this._syncTimer){clearInterval(this._syncTimer);this._syncTimer=null}
+    }
+    this._updateIcon();
+  }
+};
+
+// Обёртки localStorage с облачной синхронизацией
+// cloudGet — всегда читает из localStorage (он же кэш)
+function cloudGet(k,d){
+  return LS.get(k,d);
+}
+// cloudSet — записывает в localStorage + ставит в очередь на выгрузку
+function cloudSet(k,v){
+  LS.set(k,v);
+  // Если облако подключено — ставим в очередь
+  if(Cloud.config.url && Cloud.connected){
+    Cloud.queueSync(k);
+  }
+}
 
 function initDefaults(){
   if(!LS.get('zp_employees')){
@@ -368,6 +661,10 @@ function doLogin(){
   else if(role==='manager')state.tab='daily';
   else state.tab='report';
   render();
+  // Фоновая синхронизация с облаком при входе
+  if(Cloud.config.url){
+    setTimeout(()=>{Cloud.sync().then(ok=>{if(ok)render()})},1000);
+  }
 }
 
 function logout(){
@@ -400,7 +697,14 @@ function getTabs(){
 function renderApp(){
   const tabs=getTabs();
   if(!tabs.find(t=>t.id===state.tab))state.tab=tabs[0].id;
+  const cloudLastSync=Cloud.lastSync?new Date(Cloud.lastSync).toLocaleString('ru-RU'):'никогда';
   let html=`<div class="header"><h1>🦷 Земский доктор-стоматолог</h1><div class="user-info">${roleLabel(state.role)} (${LS.get('zp_session',{}).login||''})
+    <span id="cloud-icon" class="cloud-icon" title="Облако" style="margin-left:6px">☁️</span><div id="cloud-menu" class="cloud-menu">
+      <div class="cloud-menu-item" id="cm-sync">🔄 Синхронизировать</div>
+      <div class="cloud-menu-item" id="cm-push">⬆️ Выгрузить в облако</div>
+      <div class="cloud-menu-item" id="cm-pull">⬇️ Загрузить из облака</div>
+      <div class="cloud-status-bar">${Cloud.connected?'✅ Подключено':'⚪ Не подключено'} · Последняя: ${cloudLastSync}</div>
+    </div>
     <button id="theme-toggle" title="Сменить тему" style="font-size:16px;padding:6px 10px">${LS.get('zp_theme','dark')==='light'?'☀️':'🌙'}</button>
     <button onclick="logout()">Выйти</button></div></div>`;
   html+=`<div class="tabs">`;
@@ -440,6 +744,19 @@ function bindApp(){
   };
   // Apply saved theme on load
   if(LS.get('zp_theme','dark')==='light')document.body.classList.add('light');
+  // Cloud menu
+  const cloudIcon=document.getElementById('cloud-icon');
+  const cloudMenu=document.getElementById('cloud-menu');
+  if(cloudIcon&&cloudMenu){
+    cloudIcon.onclick=(e)=>{e.stopPropagation();cloudMenu.classList.toggle('show')};
+    document.addEventListener('click',()=>cloudMenu.classList.remove('show'));
+    const cmSync=document.getElementById('cm-sync');
+    const cmPush=document.getElementById('cm-push');
+    const cmPull=document.getElementById('cm-pull');
+    if(cmSync)cmSync.onclick=()=>{cloudMenu.classList.remove('show');Cloud.sync().then(ok=>{if(ok)render()})};
+    if(cmPush)cmPush.onclick=()=>{cloudMenu.classList.remove('show');Cloud.pushAll()};
+    if(cmPull)cmPull.onclick=()=>{cloudMenu.classList.remove('show');Cloud.sync().then(ok=>{if(ok)render()})};
+  }
   bindTabContent();
 }
 
@@ -1293,15 +1610,25 @@ function bindEmployees(){
         document.getElementById('emp-fixed-day').value=emp.fixedDay;
         document.getElementById('emp-fixed-month').value=emp.fixedMonth;
         document.getElementById('emp-percent').value=emp.percent;
-        document.getElementById('emp-app-role').value=emp.appRole||'none';
         document.getElementById('emp-login').value=emp.login||'';
         document.getElementById('emp-pass').value=emp.pass||'';
         document.getElementById('emp-form-title').textContent='Редактирование: '+emp.name;
-        // Trigger visibility update for cred fields
-        const roleSelect=document.getElementById('emp-app-role');
-        const show=roleSelect.value&&roleSelect.value!=='none';
-        document.getElementById('emp-cred-fields').style.display=show?'':'none';
-        document.getElementById('emp-pass-fields').style.display=show?'':'none';
+        // Показать/скрыть поля логина/пароля
+        const canLogin=emp.appRole&&emp.appRole!=='none';
+        document.getElementById('emp-can-login').checked=canLogin;
+        const credFields=document.getElementById('emp-cred-fields');
+        const passFields=document.getElementById('emp-pass-fields');
+        const permsSection=document.getElementById('emp-perms-section');
+        if(credFields)credFields.style.display=canLogin?'':'none';
+        if(passFields)passFields.style.display=canLogin?'':'none';
+        if(permsSection)permsSection.style.display=canLogin?'':'none';
+        // Заполнить права доступа
+        if(emp.permissions){
+          document.querySelectorAll('.emp-perm').forEach(cb=>{
+            const perm=cb.dataset.perm;
+            cb.checked=!!emp.permissions[perm];
+          });
+        }
       },50);
     };
   });
@@ -1369,6 +1696,28 @@ function renderSettings(){
       </div>
       <input type="file" id="import-file" accept=".json" style="display:none">
     </div>
+
+    <div class="settings-section">
+      <h4>☁️ Облачное хранилище</h4>
+      <div class="cloud-config">
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Синхронизация данных через Google Sheets. Приложение работает без интернета — данные кэшируются локально.</p>
+        <div class="cc-row"><label>URL Apps Script</label><input type="text" id="cloud-url" value="${Cloud.config.url||''}" placeholder="https://script.google.com/macros/s/.../exec"></div>
+        <div class="cc-row"><label>API-ключ</label><input type="password" id="cloud-key" value="${Cloud.config.key||''}" placeholder="Ключ из Apps Script"></div>
+        <div class="cc-btns">
+          <button class="btn btn-outline btn-sm" id="cloud-check">🔍 Проверить</button>
+          <button class="btn btn-primary btn-sm" id="cloud-save-config">💾 Сохранить настройки</button>
+        </div>
+        <div style="margin-top:12px;padding:10px;background:var(--input-bg);border-radius:var(--radius-sm);font-size:12px;color:var(--text-dim)">
+          Статус: <span id="cloud-status-text" style="color:${Cloud.connected?'var(--green)':'var(--yellow)'}">${Cloud.connected?'✅ Подключено':'⚪ Не настроено'}</span>
+          ${Cloud.lastSync?' · Последняя синхронизация: '+new Date(Cloud.lastSync).toLocaleString('ru-RU'):'')}
+        </div>
+        <div class="cc-btns" style="margin-top:12px">
+          <button class="btn btn-success btn-sm" id="cloud-pull" ${Cloud.config.url?'':'disabled'}>⬇️ Загрузить из облака</button>
+          <button class="btn btn-primary btn-sm" id="cloud-push" ${Cloud.config.url?'':'disabled'}>⬆️ Выгрузить в облако</button>
+          <button class="btn btn-warning btn-sm" id="cloud-sync" ${Cloud.config.url?'':'disabled'}>🔄 Синхронизировать</button>
+        </div>
+      </div>
+    </div>
   </div>`;
   return html;
 }
@@ -1421,11 +1770,64 @@ function bindSettings(){
     initDefaults();
     toast('Все данные очищены');render();
   };
+  // Cloud settings bindings
+  const cloudCheck=document.getElementById('cloud-check');
+  if(cloudCheck)cloudCheck.onclick=async()=>{
+    const url=document.getElementById('cloud-url').value.trim();
+    if(!url){toast('Введите URL Apps Script');return}
+    cloudCheck.disabled=true;cloudCheck.textContent='⏳ Проверка...';
+    const oldUrl=Cloud.config.url;Cloud.config.url=url.replace(/\/$/,'');
+    const p=await Cloud.ping();
+    Cloud.config.url=oldUrl;
+    cloudCheck.disabled=false;cloudCheck.textContent='🔍 Проверить';
+    const st=document.getElementById('cloud-status-text');
+    if(p.ok){st.textContent='✅ Подключено (v'+(p.data?.version||'?')+')';st.style.color='var(--green)';toast('Облако доступно')}
+    else{st.textContent='❌ Ошибка: '+p.error;st.style.color='var(--red)';toast('Не удалось подключиться')}
+  };
+  const cloudSave=document.getElementById('cloud-save-config');
+  if(cloudSave)cloudSave.onclick=()=>{
+    const url=document.getElementById('cloud-url').value.trim();
+    const key=document.getElementById('cloud-key').value.trim();
+    Cloud.configure(url,key);
+    const st=document.getElementById('cloud-status-text');
+    st.textContent='⏳ Проверка...';st.style.color='var(--yellow)';
+    setTimeout(async()=>{
+      const p=await Cloud.ping();
+      if(p.ok){st.textContent='✅ Подключено';st.style.color='var(--green)';toast('Настройки облака сохранены')}
+      else{st.textContent='❌ Ошибка подключения';st.style.color='var(--red)';toast('URL сохранён, но подключиться не удалось')}
+    },500);
+  };
+  const cloudPull=document.getElementById('cloud-pull');
+  if(cloudPull)cloudPull.onclick=()=>{
+    if(!confirm('Заменить ВСЕ локальные данные данными из облака?'))return;
+    cloudPull.disabled=true;cloudPull.textContent='⏳ Загрузка...';
+    Cloud.sync().then(ok=>{
+      cloudPull.disabled=false;cloudPull.textContent='⬇️ Загрузить из облака';
+      if(ok)render();
+    });
+  };
+  const cloudPush=document.getElementById('cloud-push');
+  if(cloudPush)cloudPush.onclick=()=>{
+    cloudPush.disabled=true;cloudPush.textContent='⏳ Выгрузка...';
+    Cloud.pushAll().then(ok=>{
+      cloudPush.disabled=false;cloudPush.textContent='⬆️ Выгрузить в облако';
+    });
+  };
+  const cloudSyncBtn=document.getElementById('cloud-sync');
+  if(cloudSyncBtn)cloudSyncBtn.onclick=()=>{
+    cloudSyncBtn.disabled=true;cloudSyncBtn.textContent='⏳ Синхронизация...';
+    Cloud.sync().then(ok=>{
+      cloudSyncBtn.disabled=false;cloudSyncBtn.textContent='🔄 Синхронизировать';
+      if(ok)render();
+    });
+  };
 }
 
 window.logout=logout;
 
-render();
+// Инициализация облачного хранилища
+Cloud.init().then(()=>render());
+
 })();
 </script>
 </body>
