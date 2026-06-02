@@ -237,7 +237,7 @@ const Cloud={
   async ping(){
     if(!this.config.url)return{ok:false,error:'URL не настроен'};
     try{
-      const r=await fetch(this.config.url+'?action=ping',{signal:AbortSignal.timeout(8000)});
+      const r=await fetch(this.config.url+'?action=ping',{redirect:'follow',signal:AbortSignal.timeout(8000)});
       const j=await r.json();
       if(j.status==='ok'){this.connected=true;this.errorCount=0;return{ok:true,data:j.data}}
       return{ok:false,error:j.message||'Ошибка ответа'};
@@ -263,7 +263,8 @@ const Cloud={
     try{
       let url=this.config.url+'?action='+type+'&key='+encodeURIComponent(this.config.key);
       if(params){for(const[k,v] of Object.entries(params))url+='&'+k+'='+encodeURIComponent(v)}
-      const r=await fetch(url,{signal:AbortSignal.timeout(15000)});
+      const r=await fetch(url,{redirect:'follow',signal:AbortSignal.timeout(15000)});
+      if(!r.ok)throw new Error('HTTP '+r.status);
       const j=await r.json();
       if(j.status==='ok')return j.data;
       toast('☁️ Ошибка загрузки: '+j.message);return null;
@@ -276,7 +277,7 @@ const Cloud={
     try{
       const body={data,replace:!!replace};
       const r=await fetch(this.config.url+'?action='+type+'&key='+encodeURIComponent(this.config.key),{
-        method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+        method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},
         body:JSON.stringify(body),signal:AbortSignal.timeout(30000)
       });
       const j=await r.json();
