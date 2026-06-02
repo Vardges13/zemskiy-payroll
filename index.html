@@ -504,7 +504,7 @@ function initDefaults(){
       {id:3,name:'Кялоян Мгер Шаваршович',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:30,active:true},
       {id:4,name:'Сидорейко Илья Михайлович',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:25,active:true},
       {id:5,name:'Громов Ростислав Евгеньевич',position:'Врач-стоматолог',calcType:'percent',fixedDay:0,fixedMonth:0,percent:30,active:true},
-      {id:6,name:'Меркулова Ангелина Олеговна',position:'Медсестра',calcType:'fixed_day_percent',fixedDay:1200,fixedMonth:0,percent:5,active:true},
+      {id:6,name:'Меркулова Ангелина Олеговна',position:'Медсестра',calcType:'fixed_day_percent_all',fixedDay:1200,fixedMonth:0,percent:5,active:true},
       {id:7,name:'Соколова Елизавета Алексеевна',position:'Администратор',calcType:'fixed_day',fixedDay:2000,fixedMonth:0,percent:0,active:false},
       {id:8,name:'Алферова Татьяна Алексеевна',position:'Администратор',calcType:'fixed_day',fixedDay:2000,fixedMonth:0,percent:0,active:true},
       {id:9,name:'Белова Ирина Юрьевна',position:'Администратор',calcType:'fixed_day',fixedDay:1500,fixedMonth:0,percent:0,active:true},
@@ -557,7 +557,7 @@ function getEmps(){return LS.get('zp_employees',[])}
 function getActiveEmps(){return getEmps().filter(e=>e.active)}
 function getPositions(){return LS.get('zp_positions',[])}
 
-function calcSalary(emp,worked,totalRevenue){
+function calcSalary(emp,worked,totalRevenue,allRevenueOnWorkDays){
   const ct=emp.calcType;
   let salary=0;
   if(ct==='fixed_day') salary=Math.round(emp.fixedDay*worked);
@@ -566,7 +566,19 @@ function calcSalary(emp,worked,totalRevenue){
   else if(ct==='fixed_day_percent') salary=Math.round(emp.fixedDay*worked+totalRevenue*emp.percent/100);
   else if(ct==='fixed_month_percent') salary=Math.round(emp.fixedMonth+totalRevenue*emp.percent/100);
   else if(ct==='fixed_day_percent_own') salary=Math.round(emp.fixedDay*worked+(emp._ownRevenue||0)*emp.percent/100);
+  else if(ct==='fixed_day_percent_all') salary=Math.round(emp.fixedDay*worked+(allRevenueOnWorkDays||0)*emp.percent/100);
   return salary;
+}
+
+function getAllRevenueOnWorkDays(empId,days){
+  let total=0;
+  for(const day of days){
+    const d=LS.get('zp_daily_'+day,{});
+    if(d[empId]&&d[empId].worked>0){
+      for(const eid in d){if(d[eid].revenue)total+=d[eid].revenue}
+    }
+  }
+  return total;
 }
 
 function monthDays(ym){
@@ -839,7 +851,8 @@ function renderMonthly(){
       totalOwnRevenue+=d.revenue||0;
     }
     if(emp.calcType==='fixed_month'){totalWorked=0;totalOwnRevenue=0}
-    const salary=calcSalary({...emp,_ownRevenue:totalOwnRevenue},totalWorked,totalOwnRevenue);
+    const allRevOnDays=(emp.calcType==='fixed_day_percent_all')?getAllRevenueOnWorkDays(emp.id,days):0;
+    const salary=calcSalary({...emp,_ownRevenue:totalOwnRevenue},totalWorked,totalOwnRevenue,allRevOnDays);
     const advance=advances[emp.id]||0;
     const toPay=salary-advance;
     totalAll+=toPay;
@@ -905,7 +918,8 @@ function exportCSV(){
   for(const emp of emps){
     let tw=0,tp=0,trv=0;
     for(const day of days){const d=(LS.get('zp_daily_'+day,{})[emp.id]||{});tw+=d.worked||0;tp+=d.patients||0;trv+=d.revenue||0}
-    const sal=calcSalary({...emp,_ownRevenue:trv},tw,trv);
+    const allRevOnDaysCSV=(emp.calcType==='fixed_day_percent_all')?getAllRevenueOnWorkDays(emp.id,days):0;
+    const sal=calcSalary({...emp,_ownRevenue:trv},tw,trv,allRevOnDaysCSV);
     const adv=advances[emp.id]||0;
     csv+=`${emp.name};${emp.position};${tw};${tp};${trv};${sal};${adv};${sal-adv}\n`;
   }
@@ -949,7 +963,8 @@ function renderMonthReport(){
   for(const emp of emps){
     let tw=0,trv=0;
     for(const day of days){const d=(LS.get('zp_daily_'+day,{})[emp.id]||{});tw+=d.worked||0;trv+=d.revenue||0}
-    const sal=calcSalary({...emp,_ownRevenue:trv},tw,trv);
+    const allRevOnDaysR=(emp.calcType==='fixed_day_percent_all')?getAllRevenueOnWorkDays(emp.id,days):0;
+    const sal=calcSalary({...emp,_ownRevenue:trv},tw,trv,allRevOnDaysR);
     const adv=advances[emp.id]||0;
     totalFOT+=sal;
   }
@@ -1447,6 +1462,7 @@ function renderEmployees(){
             <option value="fixed_day_percent">Фикс/смен + %</option>
             <option value="fixed_month_percent">Фикс/мес + %</option>
             <option value="fixed_day_percent_own">Фикс/смен + % от своей выручки</option>
+            <option value="fixed_day_percent_all">Фикс/смен + % от общей выручки за дни смены</option>
           </select></div>
           <div><label style="font-size:12px;color:var(--text2)">Фикс за смену ₽</label><input type="number" id="emp-fixed-day" value="0" min="0"></div>
           <div><label style="font-size:12px;color:var(--text2)">Фикс за месяц ₽</label><input type="number" id="emp-fixed-month" value="0" min="0"></div>
